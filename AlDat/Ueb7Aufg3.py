@@ -1,6 +1,3 @@
-from jinja2 import Undefined
-
-
 def h1(k,m):
     return k % m
 
@@ -15,23 +12,22 @@ def hDouble(k,m,i):
     return (h1(k,m)+i*h2(k,m)) % m
 
 def hashList(m,K,hashFunc):
-    M = []
-    for i in range(m):
-        M.append(' ')
-    for i in range(len(K)):
+    M = [None] * m
+    for elem in K:
         j=0
-        linHash = hashFunc(K[i],m,j)
-        while M[linHash] != ' ':
+        linHash = hashFunc(elem,m,j)
+        while M[linHash] != None:
             j+=1
-            linHash = hashFunc(K[i],m,j)
-        M[linHash] = K[i]
-        print("|", end = "")
-        print(*M, sep = "\t|", end = "\t|\n")
+            linHash = hashFunc(elem,m,j)
+        M[linHash] = elem
+    return M
 
 K = [ 17, 23, 37, 6, 61, 103, 59, 91]
-hashList(11,K,hLin)
+print("[", end = "")
+print(*hashList(11,K,hLin), sep = "\t|", end= "]\n")
 print()
-hashList(11,K,hDouble)
+print("[", end = "")
+print(*hashList(11,K,hDouble), sep = "\t|", end= "]\n")
 
 
 

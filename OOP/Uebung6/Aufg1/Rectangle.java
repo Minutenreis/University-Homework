@@ -107,20 +107,11 @@ class Rectangle extends Figure implements MobileObjekt {
     }
 
     boolean isAligned(Rectangle r, Rectangle s) {
-        return (((left(r) == right(s) || right(r) == left(s))
-                && (isInBetweenVertical(r, s) || isInBetweenVertical(s, r)))
+        return ((((left(r) == right(s) || right(r) == left(s))
+                && (top(r) != bot(s) || bot(r) != top(s)))
                 || ((top(r) == bot(s) || bot(r) == top(s))
-                        && (isInBetweenHorizontal(r, s) || isInBetweenHorizontal(s, r))));
-    }
-
-    boolean isInBetweenHorizontal(Rectangle r, Rectangle s) {
-        return (left(r) >= left(s) && left(r) < right(s)
-                || right(r) > left(s) && right(r) <= right(s));
-    }
-
-    boolean isInBetweenVertical(Rectangle r, Rectangle s) {
-        return (top(r) > bot(s) && top(r) <= top(s)
-                || bot(r) >= bot(s) && bot(r) < top(s));
+                        && (left(r) != right(s) || right(r) != left(s))))
+                        && !isDisjointed(r, s)); //wenn nicht disjointed, berühren sie sich in strecke
     }
 
 }

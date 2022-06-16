@@ -108,9 +108,9 @@ class Rectangle extends Figure implements MobileObjekt {
 
     boolean isAligned(Rectangle r, Rectangle s) {
         return ((((left(r) == right(s) || right(r) == left(s))
-                && (top(r) != bot(s) || bot(r) != top(s))) //berühren sich nicht in Punkt
+                && (top(r) != bot(s) && bot(r) != top(s))) //berühren sich nicht in Punkt
                 || ((top(r) == bot(s) || bot(r) == top(s))
-                        && (left(r) != right(s) || right(r) != left(s)))) //berühren sich nicht in Punkt
+                        && (left(r) != right(s) && right(r) != left(s)))) //berühren sich nicht in Punkt
                         && !isDisjointed(r, s)); //wenn nicht disjointed, berühren sie sich in strecke
     }
 

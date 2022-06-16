@@ -15,6 +15,8 @@ public class RectangleTest {
         System.out.println("r0 and r1: "+r0.relativePosition(r1));
         r0.move(0, -5);
         System.out.println("down moved r0 and r1: "+r0.relativePosition(r1));
+        r0.move(-10, -10);
+        System.out.println("down moved r0 and r1(corner): "+r0.relativePosition(r1));
         System.out.println("r1 and r2: "+r1.relativePosition(r2));
         System.out.println("r3 and r1: "+r3.relativePosition(r1));
         System.out.println("r3 and r2: "+r3.relativePosition(r2));

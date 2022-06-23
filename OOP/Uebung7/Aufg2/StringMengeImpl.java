@@ -2,24 +2,20 @@ import java.util.LinkedList;
 
 public class StringMengeImpl extends AbstrakteStringMenge{
     private LinkedList<String> elementList;
-    private int size;
 
     public StringMengeImpl() {
         elementList = new LinkedList<String>();
-        size = 0;
     }
 
     public void add(String s){
         if(!elementList.contains(s)){
             elementList.add(s);
-            size++;
         }
     }
 
     public void remove(String s){
         if(elementList.contains(s)){
             elementList.remove(s);
-            size--;
         }
     }
 
@@ -32,7 +28,7 @@ public class StringMengeImpl extends AbstrakteStringMenge{
     }
 
     public int getSize(){
-        return size;
+        return elementList.size();
     }
 
 

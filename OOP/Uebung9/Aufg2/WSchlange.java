@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 
 public class WSchlange {
-    LinkedList<Object> elementList;
+    private LinkedList<Object> elementList;
 
     public WSchlange() {
         elementList = new LinkedList<Object>();
@@ -13,6 +13,10 @@ public class WSchlange {
 
     public Object dequeue() {
         return elementList.removeFirst();
+    }
+
+    public Object peek() {
+        return elementList.getFirst();
     }
 
     public void print() {

@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 
 public class Schlange<T> {
-    LinkedList<T> elementList;
+    private LinkedList<T> elementList;
 
     public Schlange() {
         elementList = new LinkedList<T>();
@@ -13,6 +13,10 @@ public class Schlange<T> {
 
     public T dequeue() {
         return elementList.removeFirst();
+    }
+
+    public T peek() {
+        return elementList.getFirst();
     }
 
     public void print() {

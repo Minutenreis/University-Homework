@@ -7,11 +7,11 @@ public class WSchlange {
         elementList = new LinkedList<Object>();
     }
 
-    public void push(Object e) {
+    public void enqueue(Object e) {
         elementList.add(e);
     }
 
-    public Object pop() {
+    public Object dequeue() {
         return elementList.removeFirst();
     }
 

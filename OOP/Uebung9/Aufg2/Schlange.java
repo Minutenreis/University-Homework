@@ -7,11 +7,11 @@ public class Schlange<T> {
         elementList = new LinkedList<T>();
     }
 
-    public void push(T e) {
+    public void enqueue(T e) {
         elementList.add(e);
     }
 
-    public T pop() {
+    public T dequeue() {
         return elementList.removeFirst();
     }
 

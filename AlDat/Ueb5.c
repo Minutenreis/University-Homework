@@ -1,16 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-double getMedian(int C[], int n) // O(1)
+int getMedian(int C[], int n) // O(1)
 {
-    if (n % 2 == 0) // gerade Anzahl an Elementen => Durchschnitt der Mitte
-    {
-        return (C[n / 2] + C[n / 2 - 1]) / 2.0;
-    }
-    else // ungerade Anzahl => mittleres Element
-    {
+    if (n % 2 == 0)
+        return C[n / 2 - 1];
+    else
         return C[n / 2];
-    }
 }
 
 int cmpfunc(const void *a, const void *b) // O(1)
@@ -18,7 +14,7 @@ int cmpfunc(const void *a, const void *b) // O(1)
     return (*(int *)a - *(int *)b);
 }
 
-double median(int A[], int B[], int n) // O(log n)
+int median(int A[], int B[], int n) // O(log n)
 {
     if (n == 0) // Leeres Array => kein Element
     {
@@ -26,7 +22,7 @@ double median(int A[], int B[], int n) // O(log n)
     }
     else if (n == 1) // Ein Element in jedem Array => Durchschnitt der Beiden
     {
-        return (A[0] + B[0]) / 2.0; // O(1)
+        return A[0]<B[0]? A[0]:B[0]; // O(1)
     }
     else if (n == 2) // Zwei Elemente in jedem Array, Median = Median der 4 Elemente
     {
@@ -35,8 +31,8 @@ double median(int A[], int B[], int n) // O(log n)
         return getMedian(C, 4);             // O(1)
     }
 
-    double mA = getMedian(A, n); // O(1)
-    double mB = getMedian(B, n); // O(1)
+    int mA = getMedian(A, n); // O(1)
+    int mB = getMedian(B, n); // O(1)
 
     if (mA == mB) // mA <= m <= mB => m = mA = mB
     {
@@ -56,6 +52,6 @@ int main(int argc, char const *argv[])
 {
     int A[] = {1, 5, 6, 7, 8};
     int B[] = {2, 3, 4, 9, 10};
-    printf("%lf\n", median(A, B, 5));
+    printf("%d\n", median(A, B, 5));
     return 0;
 }

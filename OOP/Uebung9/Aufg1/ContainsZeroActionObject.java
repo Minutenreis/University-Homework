@@ -6,4 +6,8 @@ public class ContainsZeroActionObject implements ActionObject {
             containsZero = true;
         }
     }
+
+    boolean containsZero(){
+        return containsZero;
+    }
 }

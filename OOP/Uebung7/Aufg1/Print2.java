@@ -5,6 +5,14 @@ public class Print2 extends Print1 {
         return x;
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getXPrint2() {
+        return x;
+    }
+
     public void print(A a) {
         System.out.print("Print 2 A x=" + x + " ");
         System.out.println(x);

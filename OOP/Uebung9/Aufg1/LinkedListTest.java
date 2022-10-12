@@ -15,15 +15,15 @@ public class LinkedListTest {
         showPosSum(list);
     }
 
-    static public void showContainsZero(List list){
+    static public void showContainsZero(List list) {
         ContainsZeroActionObject containsZeroAO = new ContainsZeroActionObject();
         list.traverseAndApply(containsZeroAO);
-        System.out.println("ContainsZero: " + containsZeroAO.containsZero);
+        System.out.println("ContainsZero: " + containsZeroAO.containsZero());
     }
 
     static public void showPosSum(List list){
         PosSumActionObject posSumAO = new PosSumActionObject();
         list.traverseAndApply(posSumAO);
-        System.out.println("PosSum: " + posSumAO.sum);
+        System.out.println("PosSum: " + posSumAO.getSum());
     }
 }

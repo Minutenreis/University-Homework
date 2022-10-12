@@ -40,9 +40,10 @@ public class Test {
 
         Print1 p1 = new Print1();
         Print2 p2 = new Print2();
+        p2.setX(4);
         p1 = p2;
         System.out.print("Aufruf 1 ");
-        System.out.println(p1.getX()); // Aufruf 1
+        System.out.println(p1.x); // Aufruf 1
         System.out.print("Aufruf 2 ");
         p1.print(c); // Aufruf 2
         System.out.print("Aufruf 3 ");

@@ -1,7 +1,12 @@
 
 public class RectangleTest {
     public static void main(String[] args) {
-            Rectangle r0 = new Rectangle(0, 0, 10, 10);
+            Rectangle r0 = new Rectangle(0, 0, 10, 10){
+                @Override
+                float getWidth() {
+                    return 10;
+                }
+            };
             Rectangle r1 = new Rectangle(0, 0, 10, 10);
             Rectangle r2 = new Rectangle(0, 0, 10, 20);
             Rectangle r3 = new Rectangle(0, -10, 10, 10);

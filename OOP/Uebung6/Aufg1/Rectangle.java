@@ -10,7 +10,7 @@ class Rectangle extends Figure implements MobileObjekt {
 
     Rectangle(float pointX, float pointY, float width, float height) {
         super(pointX, pointY);
-        if(width <= 0 || height <= 0){
+        if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException("Width and height must be greater than 0");
         }
         this.width = width;
@@ -38,7 +38,7 @@ class Rectangle extends Figure implements MobileObjekt {
 
     @Override
     public void increase(float n) {
-        if(n<=0){
+        if (n <= 0) {
             throw new IllegalArgumentException("Error: n must be greater than 0");
         }
         width *= n;
@@ -47,7 +47,7 @@ class Rectangle extends Figure implements MobileObjekt {
 
     @Override
     public void decrease(float n) {
-        if(n <= 0){
+        if (n <= 0) {
             throw new IllegalArgumentException("n must be greater than 0");
         }
         width /= n;
@@ -108,10 +108,10 @@ class Rectangle extends Figure implements MobileObjekt {
 
     boolean isAligned(Rectangle r, Rectangle s) {
         return ((((left(r) == right(s) || right(r) == left(s))
-                && (top(r) != bot(s) && bot(r) != top(s))) //berühren sich nicht in Punkt
+                && (top(r) != bot(s) && bot(r) != top(s))) // berühren sich nicht in Punkt
                 || ((top(r) == bot(s) || bot(r) == top(s))
-                        && (left(r) != right(s) && right(r) != left(s)))) //berühren sich nicht in Punkt
-                        && !isDisjointed(r, s)); //wenn nicht disjointed, berühren sie sich in strecke
+                        && (left(r) != right(s) && right(r) != left(s)))) // berühren sich nicht in Punkt
+                && !isDisjointed(r, s)); // wenn nicht disjointed, berühren sie sich in strecke
     }
 
 }

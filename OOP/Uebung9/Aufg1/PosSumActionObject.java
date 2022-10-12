@@ -6,4 +6,8 @@ public class PosSumActionObject implements ActionObject{
             sum += (int) n.data;
         }
     }
+
+    int getSum(){
+        return sum;
+    }
 }

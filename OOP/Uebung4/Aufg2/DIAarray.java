@@ -1,11 +1,6 @@
 class DIAarray extends DynIntArray {
     
-    int[] array;
-    
-    DIAarray() {
-        super();
-        this.array = new int[0];
-    }
+    int[] array = new int[0];
 
     @Override
     int getElementCount() {

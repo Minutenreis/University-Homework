@@ -5,6 +5,10 @@ public class Print1 {
         return x;
     }
 
+    public int getXPrint1() {
+        return x;
+    }
+
     public void print(A a) {
         System.out.print("Print 1 A x=" + x + " ");
         System.out.println(x);

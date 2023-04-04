@@ -1,2 +1,2 @@
 #lang scheme
-(display "Hello, World!")
+(display "Hello, World!\n")

@@ -4,3 +4,5 @@
 *.class
 !.gitkeep
 .vscode/*
+/support/*
+!support/.gitkeep

@@ -38,11 +38,13 @@ for i in range(20):
     print()
     h = h * np.double(0.25)
 
-start = 0
+start = 14
 end = 20
 hrange = [0.25**i for i in range(start, end+1)]
-plt.plot(range(start, end+1), absD(hrange), label="|D(h) = -f'(x0)|")
-plt.plot(range(start, end+1), absS(hrange), label="|S(h) = -f'(x0)|")
+plt.plot(range(start, end+1), absD(hrange), label="|D(h)-f'(x0)|")
+plt.plot(range(start, end+1), absS(hrange), label="|S(h)-f'(x0)|")
+plt.xlabel("n; h = 0.25^n")
+plt.ylabel("Error")
 plt.legend()
 plt.grid(True)
 plt.show()

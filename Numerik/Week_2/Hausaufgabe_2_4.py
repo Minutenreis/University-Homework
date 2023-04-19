@@ -5,26 +5,14 @@ x0 = np.double(0.5)
 
 
 def f(x): return x * np.sin(x)
-
-
 def df(x): return np.sin(x) + x * np.cos(x)
-
-
-dfx = df(x0)
-
-
 def D(h): return (f(x0 + h) - f(x0))/h
-
-
 def S(h): return (f(x0 + h) - f(x0 - h))/(np.multiply(2, h))
-
-
 def absD(h): return np.abs(D(h) - dfx)
-
-
 def absS(h): return np.abs(S(h) - dfx)
 
 
+dfx = df(x0)
 h = np.double(0.25)
 
 print('df(x0) =', df(x0))
@@ -38,7 +26,7 @@ for i in range(20):
     print()
     h = h * np.double(0.25)
 
-start = 14
+start = 10
 end = 20
 hrange = [0.25**i for i in range(start, end+1)]
 plt.plot(range(start, end+1), absD(hrange), label="|D(h)-f'(x0)|")

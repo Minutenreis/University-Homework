@@ -2,6 +2,7 @@
 *.zip
 *.out
 *.class
-GIP/andere_Studenten/*
 !.gitkeep
 .vscode/*
+/support/*
+!support/.gitkeep

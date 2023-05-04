@@ -331,7 +331,7 @@ Wieso ein eigenes Kapitel für Null-Werte?
 `null` ist `null`, oder nicht?
 Das stimmt so leider nur für Objekte.
 Wenn man einen Werttyp hat, so kann dieser nicht `null` sein.
-Ein integer hat zum Beispiel als `null` den Wert 0.
+Ein Integer hat zum Beispiel statt `null` den default Wert 0.
 
 Statt also einen generischen Typen auf `null` zu setzen gibt es stattdessen die Methode `default(T)` in C#.
 Diese gibt den für den jeweiligen Datentyp richtigen Default Wert zurück.

@@ -21,26 +21,26 @@
        ((> x (entry set))
         (element-of-set? x (right-branch set)))))
 
-(define (adjoin-set x set); nicht genutzt, weil ein Großteil sich um Bäume im Allgemeinen und nicht Mengen im speziellen bezieht
+(define (adjoin-set set x ); nicht genutzt, weil ein Großteil sich um Bäume im Allgemeinen und nicht Mengen im speziellen bezieht
   (cond ((null? set) (make-tree x '() '()))
        ((= x (entry set)) set)
        ((< x (entry set))
         (make-tree (entry set)
-                  (adjoin-set x (left-branch set))
+                  (adjoin-set (left-branch set) x )
                   (right-branch set)))
        ((> x (entry set))
         (make-tree (entry set)
                   (left-branch set)
-                  (adjoin-set x (right-branch set))))))
+                  (adjoin-set (right-branch set) x )))))
 
-(define (liste->baum liste) ; TODO: implement
+(define (liste->baum liste)
   (liste->baum-helper liste the-empty-tree)
   )
 
 (define (liste->baum-helper liste baum)
   (if (null? liste) baum
      (liste->baum-helper (cdr liste) (baum-einfuegen  baum (car liste))))
-  )
+  ); baum-einfuegen durch adjoin-set tauschen falls Bäume immer Mengen darstellen sollen
 
 (define (baum-einfuegen baum element)
   (if (empty-tree? baum) (make-tree element '() '())
@@ -97,7 +97,7 @@
 
 ; Tests with * mean that permutate would have made the results unreliable (unknown inputorder => unknown output)
 (displayln (liste->baum '(4 2 1 3 7 6 8))) ; should be (4 (2 (1 () ()) (3 () ())) (7 (6 () ()) (8 () ())))*
-(displayln (baum->liste-infix (liste->baum (permutate '(1 2 3 3 5 6 7))))) ; should be (1 2 3 4 5 6 7)
+(displayln (baum->liste-infix (liste->baum (permutate '(1 2 3 4 5 6 7))))) ; should be (1 2 3 4 5 6 7)
 (displayln (baum->liste-praefix (liste->baum '(4 2 1 3 7 6 8)))) ; should be (4 2 1 3 7 6 8)*
 (displayln (baum->liste-infix (schnitt (liste->baum (permutate '(1 2 3 4 5 6 7))) (liste->baum (permutate '(1 2 3 4 5 6 7)))))) ; should be (1 2 3 4 5 6 7)
 (displayln (baum->liste-infix (vereinigung (liste->baum (permutate '(1 2 3 4 5 6 7))) (liste->baum (permutate '(1 2 3 4 5 6 7)))))) ; should be (1 2 3 4 5 6 7)
@@ -114,4 +114,4 @@
 
 
 ; sollte man alle Bäume als Menge annehmen? denn in der Aufgabe war im Großteil nur von Bäumen im Allgemeinen die Rede
-; und nicht von Mengen => Funktionen für Bäume statt Mengen definiert; sonst Baum-einfuegen durch adjoin-set ersetzen
+; und nicht von Mengen => Funktionen für Bäume statt Mengen definiert; sonst Baum-einfuegen durch adjoin-set ersetzen in liste->baum-helfer

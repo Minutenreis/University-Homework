@@ -17,10 +17,7 @@
   )
 
 (define (devides? n m) ; ist m Teiler von n
-  (cond
-    [(zero? (modulo n m)) #t]
-    [else #f]
-    )
+  (zero? (modulo n m))
   )
 
 (define (first-primes n); tries for each prime all possible factors

@@ -1,0 +1,10 @@
+== Java GUI
+
+wir nutzen Swing (ich hab versucht JavaFx zum laufen zu kriegen, erscheint mir aber zu nervig)
+
+ich würde es erstmal nur mit der MailApi kompatibel machen, Sockets sind nen afterthought
+
+=== ToDo
+
+* Speicherung auf Festplatte
+** Mails löschen können

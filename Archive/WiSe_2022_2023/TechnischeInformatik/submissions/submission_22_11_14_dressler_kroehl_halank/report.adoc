@@ -1,0 +1,13 @@
+= Report Submission 24.10.2022
+
+== Justus Dreßler
+
+Vorbereitung und Bau der Module
+
+== Julius Halank
+
+Übertragung auf FPGA's
+
+== Thorsten Kröhl
+
+Kontrolle der Module

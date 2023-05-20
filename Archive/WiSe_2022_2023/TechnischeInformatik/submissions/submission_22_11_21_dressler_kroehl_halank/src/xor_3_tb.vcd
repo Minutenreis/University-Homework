@@ -1,0 +1,57 @@
+$date
+	Tue Nov 15 16:45:39 2022
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module xor_3_tb $end
+$var wire 1 ! l_res $end
+$var reg 1 " l_in0 $end
+$var reg 1 # l_in1 $end
+$var reg 1 $ l_in2 $end
+$scope module m_dut $end
+$var wire 1 " i_in0 $end
+$var wire 1 # i_in1 $end
+$var wire 1 $ i_in2 $end
+$var wire 1 % l_xor0 $end
+$var wire 1 ! o_res $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+0%
+0$
+0#
+0"
+0!
+$end
+#10
+1!
+1$
+#20
+1%
+0$
+1#
+#30
+0#
+1"
+#40
+0!
+1$
+1#
+0"
+#50
+0#
+1"
+#60
+0%
+0$
+1#
+#70
+1!
+1$
+#80

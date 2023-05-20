@@ -1,0 +1,13 @@
+= Report Submission 24.10.2022
+
+== Justus Dreßler
+
+Vorbereitung der Codes
+
+== Julius Halank
+
+Vorstellung der Ergebnisse
+
+== Thorsten Kröhl
+
+Vorbereitung der Codes (insbesondere decoder_4_2)

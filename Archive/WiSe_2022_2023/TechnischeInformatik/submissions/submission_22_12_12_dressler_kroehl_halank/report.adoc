@@ -1,0 +1,13 @@
+= Report Submission 24.10.2022
+
+== Justus Dreßler
+
+Implementation and Debugging of Submission
+
+== Julius Halank
+
+Implementation and Debugging of Submission
+
+== Thorsten Kröhl
+
+Sick with 39.3°C fever

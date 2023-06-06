@@ -1,0 +1,287 @@
+$date
+	Tue Nov  8 15:56:36 2022
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module tiny_calculator_tb $end
+$var wire 7 ! l_hex3 [6:0] $end
+$var wire 7 " l_hex2 [6:0] $end
+$var wire 7 # l_hex1 [6:0] $end
+$var wire 7 $ l_hex0 [6:0] $end
+$var reg 8 % l_sw [7:0] $end
+$scope module m_dut $end
+$var wire 8 & SW [7:0] $end
+$var wire 5 ' SUM [4:0] $end
+$var wire 7 ( HEX3 [6:0] $end
+$var wire 7 ) HEX2 [6:0] $end
+$var wire 7 * HEX1 [6:0] $end
+$var wire 7 + HEX0 [6:0] $end
+$scope module m_decoder0 $end
+$var wire 4 , i_binary_number [3:0] $end
+$var reg 7 - o_display [6:0] $end
+$upscope $end
+$scope module m_decoder1 $end
+$var wire 4 . i_binary_number [3:0] $end
+$var reg 7 / o_display [6:0] $end
+$upscope $end
+$scope module m_decoder2 $end
+$var wire 4 0 i_binary_number [3:0] $end
+$var reg 7 1 o_display [6:0] $end
+$upscope $end
+$scope module m_decoder3 $end
+$var wire 4 2 i_binary_number [3:0] $end
+$var reg 7 3 o_display [6:0] $end
+$upscope $end
+$scope module m_dut $end
+$var wire 4 4 i_a [3:0] $end
+$var wire 4 5 i_b [3:0] $end
+$var wire 1 6 i_carry_in $end
+$var wire 4 7 o_s [3:0] $end
+$var wire 1 8 o_carry_out $end
+$var wire 1 9 l_c2 $end
+$var wire 1 : l_c1 $end
+$var wire 1 ; l_c0 $end
+$scope module add0 $end
+$var wire 1 < i_a $end
+$var wire 1 = i_b $end
+$var wire 1 6 i_carry_in $end
+$var wire 1 > l_ab $end
+$var wire 1 ? l_bc $end
+$var wire 1 @ l_ca $end
+$var wire 1 ; o_carry_out $end
+$var wire 1 A o_s $end
+$upscope $end
+$scope module add1 $end
+$var wire 1 B i_a $end
+$var wire 1 C i_b $end
+$var wire 1 ; i_carry_in $end
+$var wire 1 D l_ab $end
+$var wire 1 E l_bc $end
+$var wire 1 F l_ca $end
+$var wire 1 : o_carry_out $end
+$var wire 1 G o_s $end
+$upscope $end
+$scope module add2 $end
+$var wire 1 H i_a $end
+$var wire 1 I i_b $end
+$var wire 1 : i_carry_in $end
+$var wire 1 J l_ab $end
+$var wire 1 K l_bc $end
+$var wire 1 L l_ca $end
+$var wire 1 9 o_carry_out $end
+$var wire 1 M o_s $end
+$upscope $end
+$scope module add3 $end
+$var wire 1 N i_a $end
+$var wire 1 O i_b $end
+$var wire 1 9 i_carry_in $end
+$var wire 1 P l_ab $end
+$var wire 1 Q l_bc $end
+$var wire 1 R l_ca $end
+$var wire 1 8 o_carry_out $end
+$var wire 1 S o_s $end
+$upscope $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+0S
+0R
+0Q
+0P
+0O
+0N
+0M
+0L
+0K
+0J
+0I
+0H
+0G
+0F
+0E
+0D
+0C
+0B
+0A
+0@
+0?
+0>
+0=
+0<
+0;
+0:
+09
+08
+b0 7
+06
+b0 5
+b0 4
+b1000000 3
+b0 2
+b1000000 1
+b0 0
+b1000000 /
+b0 .
+b1000000 -
+b0 ,
+b1000000 +
+b1000000 *
+b1000000 )
+b1000000 (
+b0 '
+b0 &
+b0 %
+b1000000 $
+b1000000 #
+b1000000 "
+b1000000 !
+$end
+#100
+b10010 "
+b10010 )
+b10010 1
+1M
+b101 0
+1:
+b101 '
+b101 7
+1A
+1D
+1<
+1B
+1C
+b110000 $
+b110000 +
+b110000 -
+b100100 #
+b100100 *
+b100100 /
+b11 4
+b10 5
+b11 ,
+b10 .
+b100011 %
+b100011 &
+#200
+1S
+1F
+b0 "
+b0 )
+b0 1
+19
+1;
+b1000 0
+1:
+0M
+1L
+0A
+1>
+b1000 '
+b1000 7
+0G
+0D
+1H
+1=
+0C
+b1111000 $
+b1111000 +
+b1111000 -
+b1111001 #
+b1111001 *
+b1111001 /
+b111 4
+b1 5
+b111 ,
+b1 .
+b10111 %
+b10111 &
+#300
+b1111001 !
+b1111001 (
+b1111001 3
+b1000000 "
+b1000000 )
+b1000000 1
+0S
+b1 2
+0:
+b0 0
+09
+0;
+18
+0G
+0F
+b10000 '
+b0 7
+0M
+0L
+0R
+0>
+1P
+0Q
+0<
+0B
+0H
+1N
+0=
+1O
+b0 $
+b0 +
+b0 -
+b0 #
+b0 *
+b0 /
+b1000 4
+b1000 5
+b1000 ,
+b1000 .
+b10001000 %
+b10001000 &
+#400
+b110 "
+b110 )
+b110 1
+b1110 0
+1G
+1E
+1F
+1M
+1K
+1L
+b11110 '
+b1110 7
+1S
+1Q
+1R
+1;
+1:
+19
+1>
+1D
+1J
+1<
+1B
+1H
+1=
+1C
+1I
+b1110 $
+b1110 +
+b1110 -
+b1110 #
+b1110 *
+b1110 /
+b1111 4
+b1111 5
+b1111 ,
+b1111 .
+b11111111 %
+b11111111 &
+#500

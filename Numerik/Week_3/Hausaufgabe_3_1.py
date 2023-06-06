@@ -8,9 +8,6 @@ def x_k(n, i): return -5 + 10*i/n if n > 0 else 0
 def f(x): return 1/(1+x**2)
 
 
-# def y_k(n, i): return 1/(1+x_k(n, i)**2)
-
-
 def genInterpolation(n): return lambda x: np.sum(
     [f(x_k(n, i)) *
      np.prod([(x-x_k(n, j))/(x_k(n, i)-x_k(n, j))

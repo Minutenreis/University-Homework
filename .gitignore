@@ -2,6 +2,7 @@
 *.zip
 *.out
 *.class
+*.fasta
 !.gitkeep
 .vscode/*
 /support/*

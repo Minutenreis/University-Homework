@@ -1,0 +1,13 @@
+= Report Submission 06.02.2023
+
+== Justus Dreßler
+
+Ausarbeitung der Benchmarks
+
+== Julius Halank
+
+Ausarbeitung der Benchmark 12.1
+
+== Thorsten Kröhl
+
+Ausarbeitung der Benchmark 12.2

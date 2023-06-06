@@ -1,0 +1,13 @@
+= Report Submission 24.10.2022
+
+== Justus Dreßler
+
+Vorbereitung des Codes
+
+== Julius Halank
+
+Porten auf FPGA und Testen
+
+== Thorsten Kröhl
+
+Schießen der Bilder

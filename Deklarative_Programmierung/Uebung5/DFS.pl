@@ -5,7 +5,6 @@ nachbar(n1, n2). nachbar(n1, n3). nachbar(n1, n4).
 nachbar(n2, n5). nachbar(n2, n6). nachbar(n2, n7).
 nachbar(n3, n5). nachbar(n3, n6). nachbar(n3, n7).
 nachbar(n4, n5). nachbar(n4, n6). nachbar(n4, n7).
-nachbar(n6, n1).
 
 start(n1).
 
@@ -22,7 +21,7 @@ loesungen(X, Y) :-
     loesung(Y).
 
 % erreichbar ist die transitive Hülle von nachbar, weil Y von X aus erreichbar ist, wenn es eine Folge
-% von Knoten gibt, die alle Nachbarn sind: erreichbar(X,Y) :- nachbar(X,A), nachbar(A,B), ..., nachbar(W,X), nachbar(X,Y).
+% von Knoten gibt, die alle Nachbarn sind: erreichbar(X,Y) :- nachbar(X,A), nachbar(A,B), ..., nachbar(V,W), nachbar(W,Y).
 erreichbar(X, X).
 erreichbar(X, Y) :-
     nachbar(X, Z),

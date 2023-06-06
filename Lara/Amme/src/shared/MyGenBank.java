@@ -67,7 +67,7 @@ public class MyGenBank {
 		return m;
 	}
 
-	//Overload
+	// Overload
 	public static MyGenBank EMBLToMyGenBank(BufferedReader br) throws IOException {
 		String line;
 		String id = "", ac = "", dt = "", kw = "", oc = "", de = "", dna = "";
@@ -94,6 +94,7 @@ public class MyGenBank {
 			}
 
 		}
+		de = ">" + de; // Header for Fasta
 		return new MyGenBank(id, ac, dt, oc, kw, de, dna);
 	}
 
@@ -160,6 +161,7 @@ public class MyGenBank {
 		line = br.readLine(); // erste Zeile untersuchen, wo nächstes Zeichen/Wort beginnt
 		int keywordLength = getKeywordLength(line);
 		line = line.trim();
+		de.append(">");
 		lastKey = findPropInGenBank(line, id, ac, dt, kw, oc, de, dna, br);
 		while (br.ready() && (line = br.readLine()) != null) { // ready, wenn lesbar
 			if (line.length() > keywordLength && line.substring(0, keywordLength).trim().length() == 0) { // check ob
@@ -216,11 +218,11 @@ public class MyGenBank {
 		boolean firstWord = false; // because of spaces
 		boolean spaces = false; // spaces = a
 		for (int i = 0; i < line.length(); i++) {
-			if (!String.valueOf(line.charAt(i)).matches("\s") && !firstWord) { // key found
+			if (!String.valueOf(line.charAt(i)).matches("\\s") && !firstWord) { // key found
 				firstWord = true;
-			} else if (String.valueOf(line.charAt(i)).matches("\s") && firstWord) { // spaces after key found
+			} else if (String.valueOf(line.charAt(i)).matches("\\s") && firstWord) { // spaces after key found
 				spaces = true;
-			} else if (!String.valueOf(line.charAt(i)).matches("\s") && firstWord & spaces) { // start of value found
+			} else if (!String.valueOf(line.charAt(i)).matches("\\s") && firstWord & spaces) { // start of value found
 				return i;
 			}
 		}

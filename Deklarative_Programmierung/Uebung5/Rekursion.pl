@@ -79,3 +79,5 @@ insertSorted(X, [H|T], [X, H|T]) :-
 insertSorted(X, [H|T], [H|T2]) :-
     X>H,
     insertSorted(X, T, T2).
+
+%TODO: Bogosort

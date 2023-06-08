@@ -58,7 +58,7 @@ def splineHelp(tx, i):
     return C[i] + D[i] * (tx - (t[i]+t[i+1])/2) + M[i+1] * (tx - t[i])**3/(6*h[i]) - M[i] * (tx-t[i+1])**3/(6*h[i])
 
 
-xRange = [*np.linspace(-8, 0, 1000), *np.linspace(0, 8, 1000)]
+xRange = np.linspace(-8, 8, 1000)
 print("t =", t)
 print("h =", h)
 print("C =", C)
@@ -66,7 +66,7 @@ print("D =", D)
 print("M =", M)
 print("f =", [f(tx) for tx in t])
 print("spline =", [round(spline(tx), 3) for tx in t])
-plt.plot(xRange, [f(x) for x in xRange], label="f")
+plt.plot(t, [f(x) for x in t], ".", label="f")
 plt.plot(xRange, [spline(x) for x in xRange], label="spline")
 plt.legend()
 plt.show()

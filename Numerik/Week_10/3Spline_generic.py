@@ -31,15 +31,15 @@ def TDMA(a, b, c, d):
 
 h = [t[i+1]-t[i] for i in range(len(t)-1)]
 b = [2 for i in range(len(t)-2)]
-l = [h[i]/(h[i-1]+h[i]) for i in range(1, len(t)-1)]  # c
-u = [h[i-1]/(h[i-1]+h[i]) for i in range(1, len(t)-1)]  # a
+lambda1 = [h[i]/(h[i-1]+h[i]) for i in range(1, len(t)-1)]  # c
+mu = [h[i-1]/(h[i-1]+h[i]) for i in range(1, len(t)-1)]  # a
 coeff2 = [(f(t[i])-f(t[i-1]))/(t[i]-t[i-1])
           for i in range(1, len(t))]  # f[t_i-1, t_i]
 coeff3 = [(coeff2[i]-coeff2[i-1])/(h[i-1]+h[i])
           for i in range(1, len(coeff2))]  # f[t_i-1, t_i, t_i+1]
 d = [6*coeff3[i] for i in range(len(coeff3))]  # d
 
-M = [0, *TDMA(u, b, l, d), 0]
+M = [0, *TDMA(mu, b, lambda1, d), 0]
 print(M)
 C = [(f(t[i+1])+f(t[i]))/2 - h[i]**2/12 * (M[i+1]+M[i])
      for i in range(len(t)-1)]
@@ -58,7 +58,7 @@ def splineHelp(tx, i):
     return C[i] + D[i] * (tx - (t[i]+t[i+1])/2) + M[i+1] * (tx - t[i])**3/(6*h[i]) - M[i] * (tx-t[i+1])**3/(6*h[i])
 
 
-xRange = np.linspace(-8, 8, 1000)
+xRange = [*np.linspace(-8, 0, 1000), *np.linspace(0, 8, 1000)]
 print("t =", t)
 print("h =", h)
 print("C =", C)
@@ -66,7 +66,7 @@ print("D =", D)
 print("M =", M)
 print("f =", [f(tx) for tx in t])
 print("spline =", [round(spline(tx), 3) for tx in t])
-# plt.plot(xRange, f(xRange), label="f")
+plt.plot(xRange, [f(x) for x in xRange], label="f")
 plt.plot(xRange, [spline(x) for x in xRange], label="spline")
 plt.legend()
 plt.show()

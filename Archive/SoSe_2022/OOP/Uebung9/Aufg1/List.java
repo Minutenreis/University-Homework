@@ -22,16 +22,22 @@ public class List {
         }
     }
 
-    public void remove(Node e){
+    public void traverseAndPrint() {
+        for (Node cursor = head; cursor != null; cursor = cursor.next) {
+            System.out.println(cursor.data);
+        }
+    }
+
+    public void remove(Node e) {
         if (head == null) {
             return; // Liste ist leer
         } else if (head.next == null) {
-            head = null; //e == head => einziges Element
-        } else { //e != head => mehrere Elemente
+            head = null; // e == head => einziges Element
+        } else { // e != head => mehrere Elemente
             Node current = head;
-            while (current.next != e) { //e suchen
+            while (current.next != e) { // e suchen
                 current = current.next;
-            } //current ist vorheriges Element
+            } // current ist vorheriges Element
             current.next = current.next.next;
         }
     }

@@ -26,3 +26,12 @@ sols(N, V) :-
 cs1(N, V, S) :-
     findall(_, sols(N, V), S1),
     length(S1, S).
+
+sols3(N, V) :-
+    length(L, N),
+    maplist(between(0, V), L),
+    sum_list(L, V).
+
+cs3(N, V, S) :-
+    findall(_, sols3(N, V), S1),
+    length(S1, S).

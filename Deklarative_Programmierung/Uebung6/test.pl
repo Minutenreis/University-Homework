@@ -13,7 +13,6 @@ binaer(Dec, Bi) :-
     binaer(Dec1, B1),
     atom_concat(B1, Rest, Bi).
 
-my_member(X, [X]).
 my_member(X, [X|_]).
 my_member(X, [_|T]) :-
     my_member(X, T).

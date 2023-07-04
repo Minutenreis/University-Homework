@@ -16,6 +16,5 @@
 (define (1- x)
   (- x 1))
 
-(display (a-plus 4 5))
-(newline)
-(display (b-plus 4 5))
+(a-plus 4 5)
+(b-plus 4 5)

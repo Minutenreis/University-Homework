@@ -79,3 +79,17 @@ insertSorted(X, [H|T], [X, H|T]) :-
 insertSorted(X, [H|T], [H|T2]) :-
     X>H,
     insertSorted(X, T, T2).
+
+% sortieren (Bogosort)
+head([H|_], H).
+
+isSorted([]).
+isSorted([_]).
+isSorted([H|T]) :-
+    head(T, X),
+    H=<X,
+    isSorted(T).
+bogosort(List, SortedList) :-
+    repeat,
+    random_permutation(List, SortedList),
+    isSorted(SortedList), !. 

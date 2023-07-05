@@ -11,4 +11,4 @@
      )
   )
 
-(display (cut "Hello World" 0 10))
+(cut "Hello World" 0 10)

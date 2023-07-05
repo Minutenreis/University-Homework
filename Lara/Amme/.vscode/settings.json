@@ -4,6 +4,11 @@
     ],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "lib/**/*.jar"
+        "lib/**/*.jar",
+        "/Users/larry/Desktop/PP/matplotlib4j-0.5.0.jar",
+        "/Users/larry/Desktop/PP/slf4j-api-1.7.7.jar",
+        "/Users/larry/Desktop/PP/guava-15.0.jar",
+        "/Users/larry/Desktop/PP/log4j-1.2.17.jar",
+        "/Users/larry/Desktop/PP/slf4j-log4j12-1.7.7.jar"
     ]
 }

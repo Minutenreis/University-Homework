@@ -53,3 +53,7 @@ plt.ylabel("Error")
 plt.legend()
 plt.grid(True)
 plt.show()
+
+if x <= 0:
+    print("x must be > 0")
+    exit(1)

@@ -3,7 +3,6 @@ gen_cap(MaxCap, Cap) :-
     MaxCap>0,
     MaxCap1 is MaxCap-1,
     gen_cap(MaxCap1, Cap).
-
 vollgepackt(0, _, []).
 vollgepackt(N, [H|T], [H|Caps]) :-
     N>0,

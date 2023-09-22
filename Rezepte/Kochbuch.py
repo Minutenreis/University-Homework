@@ -12,7 +12,7 @@ if "Kochbuch.adoc" in allFiles:
     os.remove("Rezepte/Kochbuch.adoc")
 
 kochbuchStart = """
-= Kochbuch
+= Kochbuch Dreßler
 :toc: auto
 :toclevels: 1
 :doctype: book

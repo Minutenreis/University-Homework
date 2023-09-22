@@ -1,0 +1,16 @@
+
+= Kochbuch
+:toc: auto
+:toclevels: 1
+:doctype: book
+
+:leveloffset: 1
+
+include::Gurkensalat.adoc[]
+
+include::Huhn_Paprika_Sahne.adoc[]
+
+include::Pizzateig.adoc[]
+
+include::Taco_Seasoning.adoc[]
+

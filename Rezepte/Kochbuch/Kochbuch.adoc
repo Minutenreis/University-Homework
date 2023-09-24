@@ -1,5 +1,5 @@
 
-= Kochbuch
+= Kochbuch Dreßler
 :toc: auto
 :toclevels: 1
 :doctype: book

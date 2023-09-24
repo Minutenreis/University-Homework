@@ -1,0 +1,46 @@
+
+= Cocktails Dreßler
+:toc: auto
+:toclevels: 2
+:doctype: book
+
+:leveloffset: 2
+
+include::AmarettoMule.adoc[]
+
+include::AnjehoHighball.adoc[]
+
+include::BitterBee.adoc[]
+
+include::Caipiroska.adoc[]
+
+include::Daiquiri.adoc[]
+
+include::ElDiablo.adoc[]
+
+include::ErricksonsShot.adoc[]
+
+include::Ford.adoc[]
+
+include::Gimlet.adoc[]
+
+include::GinBasilSmash.adoc[]
+
+include::GinGinMule.adoc[]
+
+include::JulietAndRomeo.adoc[]
+
+include::Mojito.adoc[]
+
+include::MoscowMule.adoc[]
+
+include::Penicillin.adoc[]
+
+include::RustyNail.adoc[]
+
+include::TomCollins.adoc[]
+
+include::UeberseeMule.adoc[]
+
+include::WhiskeySmash.adoc[]
+

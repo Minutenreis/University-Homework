@@ -12,7 +12,7 @@ if "Cocktails.adoc" in allFiles:
     os.remove("Rezepte/Cocktails/Cocktails.adoc")
 
 CocktailsStart = """
-= Cocktails Dreßler
+= Cocktails Hagen & Reis
 :toc: auto
 :toclevels: 2
 :doctype: book

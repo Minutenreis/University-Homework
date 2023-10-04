@@ -6,6 +6,8 @@
 
 :leveloffset: 1
 
+include::Asiatische_Nudeln_Tofu.adoc[]
+
 include::Gurkensalat.adoc[]
 
 include::Huhn_Paprika_Sahne.adoc[]

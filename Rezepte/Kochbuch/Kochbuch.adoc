@@ -8,11 +8,19 @@
 
 include::Asiatische_Nudeln_Tofu.adoc[]
 
+include::BackMozzarella.adoc[]
+
 include::Gurkensalat.adoc[]
 
 include::Huhn_Paprika_Sahne.adoc[]
 
+include::KalteTomatensuppe.adoc[]
+
+include::OfentomatenMitHonigkaese.adoc[]
+
 include::Pizzateig.adoc[]
+
+include::SpinatkloesschenMitTomatensalat.adoc[]
 
 include::Taco_Seasoning.adoc[]
 

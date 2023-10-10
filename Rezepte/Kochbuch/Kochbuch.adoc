@@ -10,17 +10,27 @@ include::Asiatische_Nudeln_Tofu.adoc[]
 
 include::BackMozzarella.adoc[]
 
+include::Chicken_Tikka_Masala.adoc[]
+
+include::Currywurst.adoc[]
+
 include::Gurkensalat.adoc[]
 
 include::Huhn_Paprika_Sahne.adoc[]
 
 include::KalteTomatensuppe.adoc[]
 
+include::Katsu_Sauce.adoc[]
+
 include::OfentomatenMitHonigkaese.adoc[]
+
+include::Pasta_Baked_Feta.adoc[]
 
 include::Pizzateig.adoc[]
 
 include::SpinatkloesschenMitTomatensalat.adoc[]
+
+include::Sweet_Sour_Sauce.adoc[]
 
 include::Taco_Seasoning.adoc[]
 

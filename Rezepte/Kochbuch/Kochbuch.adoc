@@ -6,13 +6,11 @@
 
 :leveloffset: 1
 
-include::Asiatische_Nudeln_Tofu.adoc[]
+include::Back-Mozzarella_auf_Paprikagemüse.adoc[]
 
-include::BackMozzarella.adoc[]
+include::Cheesecake_Double_Nougat.adoc[]
 
 include::Chicken_Tikka_Masala.adoc[]
-
-include::Currywurst.adoc[]
 
 include::Falscher_Schweinebraten.adoc[]
 
@@ -22,21 +20,31 @@ include::Gurkensalat.adoc[]
 
 include::Hirsebrei.adoc[]
 
-include::Huhn_Paprika_Sahne.adoc[]
+include::Hühnerbrustfiletstreifen_mit_Paprika_und_Sahne.adoc[]
 
-include::KalteTomatensuppe.adoc[]
+include::Kalte_Tomatensuppe_mit_Hackbällchen-Sticks.adoc[]
 
 include::Katsu_Sauce.adoc[]
 
-include::OfentomatenMitHonigkaese.adoc[]
+include::Mie_Nudeln_mit_Tofu_und_Gemüse.adoc[]
 
-include::Pasta_Baked_Feta.adoc[]
+include::Nougat-Masala_Chai_indischer_Gewürztee.adoc[]
+
+include::Nougat_Mug_Cake_mit_Erdnussbutter-Crunch.adoc[]
+
+include::Nougat_Panna_Cotta_mit_Erdbeer-Minz-Ragout.adoc[]
+
+include::Ofentomaten_mit_Honigkaese.adoc[]
+
+include::Pasta_mit_gebackenem_Feta.adoc[]
 
 include::Pietsmiet_Burger.adoc[]
 
+include::Pikante_Currywurst_mit_selbstgemachter_Sauce.adoc[]
+
 include::Pizzateig.adoc[]
 
-include::SpinatkloesschenMitTomatensalat.adoc[]
+include::Spinatkloessche_mit_Tomatensalat.adoc[]
 
 include::Sweet_Sour_Sauce.adoc[]
 

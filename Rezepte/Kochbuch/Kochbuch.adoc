@@ -14,7 +14,13 @@ include::Chicken_Tikka_Masala.adoc[]
 
 include::Currywurst.adoc[]
 
+include::Falscher_Schweinebraten.adoc[]
+
+include::Frühstücksbratline.adoc[]
+
 include::Gurkensalat.adoc[]
+
+include::Hirsebrei.adoc[]
 
 include::Huhn_Paprika_Sahne.adoc[]
 
@@ -26,6 +32,8 @@ include::OfentomatenMitHonigkaese.adoc[]
 
 include::Pasta_Baked_Feta.adoc[]
 
+include::Pietsmiet_Burger.adoc[]
+
 include::Pizzateig.adoc[]
 
 include::SpinatkloesschenMitTomatensalat.adoc[]
@@ -33,4 +41,6 @@ include::SpinatkloesschenMitTomatensalat.adoc[]
 include::Sweet_Sour_Sauce.adoc[]
 
 include::Taco_Seasoning.adoc[]
+
+include::Zucchini-Lasagne.adoc[]
 

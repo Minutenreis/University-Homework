@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-mypath = "Rezepte/Kochbuch"
+mypath = os.path.dirname(__file__)
 
 allFiles = [f for f in os.listdir(
     mypath) if os.path.isfile(os.path.join(mypath, f)) & f.endswith(".adoc")]
@@ -9,7 +9,7 @@ allFiles.sort()
 
 if "Kochbuch.adoc" in allFiles:
     allFiles.remove("Kochbuch.adoc")
-    os.remove("Rezepte/Kochbuch/Kochbuch.adoc")
+    os.remove(os.path.join(mypath,"Kochbuch.adoc"))
 
 kochbuchStart = """
 = Kochbuch Dreßler
@@ -21,10 +21,10 @@ kochbuchStart = """
 
 """
 
-kochbuch = open("Rezepte/Kochbuch/Kochbuch.adoc", "x")
+kochbuch = open(os.path.join(mypath,"Kochbuch.adoc"), "x")
 kochbuch.write(kochbuchStart)
 for file in allFiles:
     kochbuch.write("include::" + file + "[]\n\n")
 kochbuch.close()
 
-subprocess.run(["asciidoctor-pdf", "Rezepte/Kochbuch/Kochbuch.adoc"])
+subprocess.run(["asciidoctor-pdf", os.path.join(mypath,"Kochbuch.adoc")])

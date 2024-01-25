@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Lolalytics WR Normalizer
-// @match https://lolalytics.com/lol/tierlist/*
+// @match https://beta.lolalytics.com/lol/tierlist/*
 // @run-at document-idle
 // ==/UserScript==
 
@@ -23,19 +23,21 @@ var pageURLCheckTimer = setInterval(
 function main() {
 
     //get average Winrate of Elo Bracket
-    avgWRText = document.getElementsByClassName("Analysed_wrapper__o86fv")[0].innerText;
-    avgWRArr = avgWRText.split("\n")[0].split(" ")
-    avgWR = avgWRArr[avgWRArr.length - 1].slice(0, -2);
-
+    avgWRText = document.getElementsByClassName("ml-auto text-right")[0].textContent
+    avgWR = avgWRText.split(":")[1].split("%")[0].trim()
+    console.log("avgWR:", avgWR)
     //normalize Champion WR
-    tableData = document.getElementsByClassName("TierList_list__j33gd")[0].children
-    for (var div of tableData) {
-        index = div.childNodes[0].className.startsWith("ListRow_rank") ? 5 : 4;
-        WR = Math.round((div.childNodes[index].innerText.split("\n")[0] - avgWR + 50) * 100) / 100
+    tableData = document.getElementsByClassName("m-auto w-[99%] sm:w-[98%] lg:w-[970px] xl:w-[1038px]  menu:relative menu:left-[30px] 2xl:w-[1280px]")[0].children
+    index = 5;
+    for (i = 2; i < tableData.length; i++) {
+        div = tableData[i]
         ogStat = div.childNodes[index].innerText.split("\n")
-        div.childNodes[index].innerHTML = '<div> ' + WR + '<\div><div class="ListRow_wrdelta__dKTY+">' + ogStat[0] + "<br />" + ogStat[1] + "</div>"
-        //coloring
-        div.childNodes[index].style["color"] = getColor(WR)
+        ogWR = ogStat[0]
+        console.log("ogWR:", ogWR)
+        WR = Math.round((div.childNodes[index].innerText.split("\n")[0] - avgWR + 50) * 100) / 100
+        console.log("WR:", WR)
+        color = getColor(WR)
+        div.childNodes[index].innerHTML = '<div class="text-center"><span style="color:' + color + '"> ' + WR + '</span><br /><span class="mt-[2px] text-[11px] text-[#aaa]">' + ogStat[0] + "<br />" + ogStat[1] + "</span></div>"
     }
 }
 

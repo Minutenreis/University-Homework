@@ -1,6 +1,7 @@
 from PIL import Image
 import sys
 import time
+import os
 
 start = time.time()
 
@@ -8,9 +9,10 @@ if len(sys.argv) != 2:
     print("Usage: python trim.py <image>")
     exit(1)
 
+input_name = sys.argv[1]
 
-input_image = Image.open(sys.argv[1])
-output_name = input_image.filename.split(".")[0] + "_trimmed.png"
+input_image = Image.open(input_name)
+output_name = os.path.basename(input_name).split(".")[0] + "_trimmed.png"
 
 input_image = input_image.convert("RGBA")
 

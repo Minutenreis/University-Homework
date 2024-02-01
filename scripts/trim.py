@@ -21,12 +21,11 @@ datas = input_image.getdata()
 radius = 10
 
 def shouldAddWhite(datas, i, j):
-    for k in range(-radius, radius+1):
-        for l in range(-radius, radius+1):
-            if k*k + l*l <= radius*radius:
-                if i+k >= 0 and i+k < input_image.width and j+l >= 0 and j+l < input_image.height:
-                    if datas[i+k + (j+l) * input_image.width][3] != 0:
-                        return True
+    # for l,k in [(-radius,-radius),(-radius,radius),(radius,-radius),(radius,radius), (-radius,0),(radius,0),(0,-radius),(0,radius)]:
+    for l,k in [(-radius,-radius),(-radius,radius),(radius,-radius),(radius,radius)]:
+        if i+k >= 0 and i+k < input_image.width and j+l >= 0 and j+l < input_image.height:
+            if datas[i+k + (j+l) * input_image.width][3] != 0:
+                return True
     return False
 
 newData = []

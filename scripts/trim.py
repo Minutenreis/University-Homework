@@ -2,6 +2,7 @@ from PIL import Image
 import sys
 import time
 import os
+import math
 
 start = time.time()
 
@@ -18,11 +19,14 @@ input_image = input_image.convert("RGBA")
 
 datas = input_image.getdata()
 
-radius = 10
+radius = 15
+radius_diag = math.floor(radius * math.cos(math.pi / 4))
+radius_short = math.floor(radius * math.sin(math.pi / 8))
+radius_long = math.floor(radius * math.cos(math.pi / 8))
 
 def shouldAddWhite(datas, i, j):
-    # for l,k in [(-radius,-radius),(-radius,radius),(radius,-radius),(radius,radius), (-radius,0),(radius,0),(0,-radius),(0,radius)]:
-    for l,k in [(-radius,-radius),(-radius,radius),(radius,-radius),(radius,radius)]:
+    for l,k in [(-radius_diag,-radius_diag),(-radius_diag,radius_diag),(radius_diag,-radius_diag),(radius_diag,radius_diag), (-radius,0),(radius,0),(0,-radius),(0,radius), (-radius_short,-radius_long),(-radius_short,radius_long),(radius_short,-radius_long),(radius_short,radius_long), (-radius_long,-radius_short),(-radius_long,radius_short),(radius_long,-radius_short),(radius_long,radius_short)]:
+    # for l,k in [(-radius,-radius),(-radius,radius),(radius,-radius),(radius,radius)]:
         if i+k >= 0 and i+k < input_image.width and j+l >= 0 and j+l < input_image.height:
             if datas[i+k + (j+l) * input_image.width][3] != 0:
                 return True

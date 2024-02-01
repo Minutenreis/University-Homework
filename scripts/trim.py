@@ -20,12 +20,13 @@ input_image = input_image.convert("RGBA")
 datas = input_image.getdata()
 
 radius = 15
-radius_diag = math.floor(radius * math.cos(math.pi / 4))
-radius_short = math.floor(radius * math.sin(math.pi / 8))
-radius_long = math.floor(radius * math.cos(math.pi / 8))
+coords = []
+for off in [0,1/4, 1/8, 3/8]:
+    for i in range(4):
+        coords.append((round(radius * math.cos(math.pi * (i / 2 + off))), round(radius * math.sin(math.pi * (i / 2 + off)))))
 
 def shouldAddWhite(datas, i, j):
-    for l,k in [(-radius_diag,-radius_diag),(-radius_diag,radius_diag),(radius_diag,-radius_diag),(radius_diag,radius_diag), (-radius,0),(radius,0),(0,-radius),(0,radius), (-radius_short,-radius_long),(-radius_short,radius_long),(radius_short,-radius_long),(radius_short,radius_long), (-radius_long,-radius_short),(-radius_long,radius_short),(radius_long,-radius_short),(radius_long,radius_short)]:
+    for l,k in coords:
     # for l,k in [(-radius,-radius),(-radius,radius),(radius,-radius),(radius,radius)]:
         if i+k >= 0 and i+k < input_image.width and j+l >= 0 and j+l < input_image.height:
             if datas[i+k + (j+l) * input_image.width][3] != 0:

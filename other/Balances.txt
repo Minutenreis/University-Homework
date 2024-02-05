@@ -1,3 +1,6 @@
+12.19 -MasterYi -RekSai +Blitzcrank +Ekko +Fizz +Garen +Jinx +KaiSa +Malphite +Nasus +Nunu +Rakan +Ryze +Shyvana +Sona +Tahm +Twitch +Udyr .Syndra
+12.20 -Aatrox -Maokai -Sett +Elise +Evelynn +Gwen +Jayce +Kennen +Rammus +Wukong +Ziggs .Blitzcrank
+12.21 -BelVeth -Blitzcrank -MissFortune +Ahri +Corki +Malzahar +XinZhao .Ornn
 13.1 -Aatrox -Mundo -Fiora -KSante -Yuumi -Zeri +Jayce +Lissandra +Shaco +Sion +TwistedFate +Xayah .Jax .Rammus
 13.1b -Gangplank -Heimerdinger -Kassadin -Kindred -Lucian -Maokai -Nami -Ryze -Udyr -Yuumi +Lillia +Orianna +Zoe
 13.3 -Annie -Amumu -Kassadin -KSante -Zac +Alistar +Braum +JarvanIV +Kayle +Kayn +Leblanc +Nautilus +Pyke +Rakan +Thresh +Trundle .Asol

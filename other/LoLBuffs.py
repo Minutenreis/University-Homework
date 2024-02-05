@@ -6,6 +6,11 @@ SkinReleasesFile = "SkinReleases.txt"
 Buffs = []
 Nerfs = []
 Adjustments = []
+buffedChamps = []
+nerfedChamps = []
+adjustedChamps = []
+
+numOfPatchesToCheck = 3
 
 with open(os.path.join(mypath, BalancesFile), "r") as f:
     Balances = f.read().splitlines()
@@ -14,14 +19,22 @@ with open(os.path.join(mypath, BalancesFile), "r") as f:
         Buffs.append([])
         Nerfs.append([])
         Adjustments.append([])
+        if(patch < max(3-numOfPatchesToCheck,0)):
+            continue
         for i, champ in enumerate(skins,1):
             if i == 1:
                 continue
             elif champ.startswith("+"):
+                if(champ[1:] not in buffedChamps):
+                    buffedChamps.append(champ[1:])
                 Buffs[patch].append(champ[1:])
             elif champ.startswith("-"):
+                if(champ[1:] not in nerfedChamps):
+                    nerfedChamps.append(champ[1:])
                 Nerfs[patch].append(champ[1:])
             elif champ.startswith("."):
+                if(champ[1:] not in adjustedChamps):
+                    adjustedChamps.append(champ[1:])
                 Adjustments[patch].append(champ[1:])
             else:
                 print("Error: Unrecognized change type")
@@ -51,7 +64,6 @@ def isInLastNPatches(champ, data, start:int, n: int) -> bool:
             return True
     return False
 
-numOfPatchesToCheck = 3
 
 for patch, data in enumerate(skins,0):
     for champ in data:
@@ -61,6 +73,7 @@ for patch, data in enumerate(skins,0):
             numNerfsBeforeSkin += 1
         if isInLastNPatches(champ, Adjustments, patch, numOfPatchesToCheck):
             numAdjustmentsBeforeSkin += 1
+print("Data for last " + str(numOfPatchesToCheck) + " patches")
 print("Buffs before skin: " + str(numBuffsBeforeSkin))
 print("Nerfs before skin: " + str(numNerfsBeforeSkin))
 print("Adjustments before skin: " + str(numAdjustmentsBeforeSkin))
@@ -69,6 +82,13 @@ print("BuffsTotal: " + str(sum(len(x) for x in Buffs)))
 print("NerfsTotal: " + str(sum(len(x) for x in Nerfs)))
 buffNerfRatio = sum(len(x) for x in Buffs)/sum(len(x) for x in Nerfs)
 print("AdjustmentsTotal: " + str(sum(len(x) for x in Adjustments)))
+print()
+print("uniqueBuffedChamps: " + str(len(buffedChamps)))
+print("uniqueNerfedChamps: " + str(len(nerfedChamps)))
+uniqueBuffNerfRatio = len(buffedChamps)/len(nerfedChamps)
+print("uniqueAdjustedChamps: " + str(len(adjustedChamps)))
+print()
 print("SkinsTotal: " + str(sum(len(x) for x in skins)))
 print()
-print("Buffs before skin relative to Buff/Nerf ratio: " + str(numBuffsBeforeSkin/numNerfsBeforeSkin * buffNerfRatio))
+print("Buffs before skin relative to Buff/Nerf ratio: " + str(numBuffsBeforeSkin/numNerfsBeforeSkin / buffNerfRatio))
+print("Buffs before skin relative to unique Buff/Nerf ratio: " + str(numBuffsBeforeSkin/numNerfsBeforeSkin / uniqueBuffNerfRatio))

@@ -1,0 +1,27 @@
+12.19 -MasterYi -RekSai +Blitzcrank +Ekko +Fizz +Garen +Jinx +KaiSa +Malphite +Nasus +Nunu +Rakan +Ryze +Shyvana +Sona +Tahm +Twitch +Udyr .Syndra
+12.20 -Aatrox -Maokai -Sett +Elise +Evelynn +Gwen +Jayce +Kennen +Rammus +Wukong +Ziggs .Blitzcrank
+12.21 -BelVeth -Blitzcrank -MissFortune +Ahri +Corki +Malzahar +XinZhao .Ornn
+13.1 -Aatrox -Mundo -Fiora -KSante -Yuumi -Zeri +Jayce +Lissandra +Shaco +Sion +TwistedFate +Xayah .Jax .Rammus
+13.1b -Gangplank -Heimerdinger -Kassadin -Kindred -Lucian -Maokai -Nami -Ryze -Udyr -Yuumi +Lillia +Orianna +Zoe
+13.3 -Annie -Amumu -Kassadin -KSante -Zac +Alistar +Braum +JarvanIV +Kayle +Kayn +Leblanc +Nautilus +Pyke +Rakan +Thresh +Trundle .Asol
+13.4 -Amumu -Anivia -Azir -Elise -JarvanIV -Jax -Maokai -Samira -Udyr +Ahri +Alistar +Aphelios +ChoGath +Malphite +Orianna +Riven +Senna +Veigar +Viego .Thresh
+13.5 -Asol -Caitlyn -Gangplank -Rammus -Twitch -Xayah -Yorick +Aatrox +Fizz +Jinx +Kennen +Leblanc +Qiyana +Rumble +Samira +Tryndamere .Ashe .Azir .Pantheon .Yuumi .Zed
+13.6 -Asol -Veigar -Yuumi +Ashe +Galio +Talon +Vayne .Mundo
+13.7 -Annie -LeeSin -Olaf -Rammus -Sejuani -Veigar -Vi -Wukong -Zeri +Alistar +Azir +Graves +Kalista +Katarina +Yasuo .KhaZix .Thresh
+13.8 -Asol -JarvanIV -Kayn -Malphite -Rakan +Ezreal +Garen +Janna +KhaZix +KogMaw +Leona +Lillia +Nidalee +Poppy
+13.9 -Jinx -Sion +Aatrox +Amumu +Swain +Trundle +Volibear .BelVeth .Kayle .Neeko .Taliyah
+13.10 +Akshan +Kalista +Kindred +Neeko +Vayne
+13.11 -Asol -Amumu -Aphelios -Jinx +Akali +Azir +Ivern +Kalista +RekSai +Renekton +TwistedFate .Rell
+13.12 -Gragas -KSante -KhaZix -KogMaw -Lulu -Milio -Rell -Yuumi -Zeri +Ashe +Gangplank +KaiSa +Nasus +Orianna +Ryze +Sivir .Lucian .Rumble
+13.13 -Annie -Aphelios -Ivern -Kindred -Neeko -RekSai -Varus -Vi -Wukong +LeeSin +Nidalee .Anivia .Rell
+13.14 -Hecarim -Jax -Karthus -Kindred -Milio -RekSai -Rell -Rengar +Aatrox +Diana +Lissandra +Shaco +Shyvana +Volibear +Xerath +Zyra
+13.15 -Aatrox -Ivern -KaiSa -Maokai -Sejuani -Shyvana +Caitlyn +Camille +Gwen +Nami +Taliyah +Yasuo +Yone .Annie .Heimerdinger .Rell .Yorick
+13.16 -Naafiri -RekSai -Shaco -Shyvana -Tristana +Akali +Brand +Caitlyn +Ekko +Karma +Lucian +Lulu +Milio +Nidalee +Sylas +Wukong .Malzahar
+13.17 -Kayn -KhaZix -Kindred -Naafiri -Xerath +Elise +Gnar +Lux +Orianna +Samira +TwistedFate +Vex +Zoe .Aatrox .Akshan .Blitzcrank .Hecarim .Quinn .Tryndamere .Vi .XinZhao
+13.18 -JarvanIV -Kayn -Rell -Tryndamere -Xayah +Gwen +Irelia +Kennen +Senna +Thresh .Bard
+13.19 -Azir -Briar -Leblanc -RekSai -Renekton -Zeri +Galio +Gangplank +Jhin +LeeSin +Lissandra +Nunu +Pyke +Syndra +Twitch
+13.20 -Akshan -BelVeth -KaiSa -Quinn -Zed +Galio +Jinx +Milio +Morgana +Ziggs .KSante
+13.21 -Asol -Briar -Caitlyn -Mundo -Jinx -Rammus +BelVeth +Hecarim +KSante +Leblanc +MasterYi +Morgana +Tahm +Varus .Brand .Seraphine .Zyra
+13.22 -Briar -Graves -KSante -Kassadin -Nilah -Senna -Tahm -Ziggs +Mundo +Rammus .Brand .Gragas .Janna .Seraphine
+13.23 -Briar -JarvanIV -KSante -Naafiri -Ziggs +Draven +Janna +Riven +Trundle +VelKoz .Azir
+13.24 -Briar -Ivern +Azir +Braum +Galio +Gragas +KSante +Leona +Lucian +Mordekaiser +Qiyana +Zeri

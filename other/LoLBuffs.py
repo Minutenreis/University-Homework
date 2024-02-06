@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 mypath = os.path.dirname(__file__)
 BalancesFile = "Balances.txt"
@@ -10,7 +11,7 @@ buffedChamps = []
 nerfedChamps = []
 adjustedChamps = []
 
-numOfPatchesToCheck = 3
+numOfPatchesToCheck = 2
 
 with open(os.path.join(mypath, BalancesFile), "r") as f:
     Balances = f.read().splitlines()
@@ -64,15 +65,22 @@ def isInLastNPatches(champ, data, start:int, n: int) -> bool:
             return True
     return False
 
+buffBeforeSkin = []
+nerfBeforeSkin = []
+adjBeforeSkin = []
 
 for patch, data in enumerate(skins,0):
     for champ in data:
         if isInLastNPatches(champ, Buffs, patch, numOfPatchesToCheck):
             numBuffsBeforeSkin += 1
+            buffBeforeSkin.append(champ)
         if isInLastNPatches(champ, Nerfs, patch, numOfPatchesToCheck):
             numNerfsBeforeSkin += 1
+            nerfBeforeSkin.append(champ)
         if isInLastNPatches(champ, Adjustments, patch, numOfPatchesToCheck):
             numAdjustmentsBeforeSkin += 1
+            adjBeforeSkin.append(champ)
+
 print("Data for last " + str(numOfPatchesToCheck) + " patches")
 print("Buffs before skin: " + str(numBuffsBeforeSkin))
 print("Nerfs before skin: " + str(numNerfsBeforeSkin))
@@ -92,3 +100,23 @@ print("SkinsTotal: " + str(sum(len(x) for x in skins)))
 print()
 print("Buffs before skin relative to Buff/Nerf ratio: " + str(numBuffsBeforeSkin/numNerfsBeforeSkin / buffNerfRatio))
 print("Buffs before skin relative to unique Buff/Nerf ratio: " + str(numBuffsBeforeSkin/numNerfsBeforeSkin / uniqueBuffNerfRatio))
+print()
+print("Buffs before skin: " + str(buffBeforeSkin))
+print("Nerfs before skin: " + str(nerfBeforeSkin))
+print("Adjustments before skin: " + str(adjBeforeSkin))
+
+# allBuffs = []
+# allNerfs = []
+# allAdjustments = []
+# for patch in Buffs:
+#     allBuffs.extend(patch)
+# for patch in Nerfs:
+#     allNerfs.extend(patch)
+# for patch in Adjustments:
+#     allAdjustments.extend(patch)
+# numBuffsPerChamp, countBuffs = np.unique(allBuffs, return_counts=True)
+# numNerfsPerChamp, countNerfs = np.unique(allNerfs, return_counts=True)
+# count_sorted_buffs = np.argsort(-countBuffs)
+# count_sorted_nerfs = np.argsort(-countNerfs)
+# print("Buffs per champ: " + str(numBuffsPerChamp[count_sorted_buffs])+str(countBuffs[count_sorted_buffs]))
+# print("Nerfs per champ: " + str(numNerfsPerChamp[count_sorted_nerfs])+str(countNerfs[count_sorted_nerfs]))

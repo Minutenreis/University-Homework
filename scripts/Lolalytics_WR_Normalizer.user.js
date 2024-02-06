@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Lolalytics WR Normalizer
-// @match https://beta.lolalytics.com/lol/tierlist/*
+// @match https://lolalytics.com/lol/tierlist/*
 // @run-at document-idle
 // ==/UserScript==
 

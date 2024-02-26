@@ -1,6 +1,6 @@
 import numpy as np
 
-k = 9
+k = 4
 n = k**2
 i = 0
 data = np.zeros(shape=(k,k))  # Create a k x k matrix of zeros

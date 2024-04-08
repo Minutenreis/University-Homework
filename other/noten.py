@@ -33,8 +33,9 @@ noten = [
     (1.0,3), # Seminar Software- und Informationssysteme 
     (1.3,6), # Grundlagen der Informations- und Softwaresysteme 
     (1.0,6), # Kryptologie
+    (1.3,6), # Projekt - Paralleles Rechnen 
     (1.0,6), # Parallel Computing I  
-    (2.3,6), # Einführung in die Künstliche Intelligenz 
+    (2.3,6), # Einführung in die Künstliche Intelligenz
     ]
 
 (avg, ects) = calcSchnitt(noten)

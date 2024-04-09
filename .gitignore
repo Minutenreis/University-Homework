@@ -1,9 +1,51 @@
+## Core latex/pdflatex auxiliary files:
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+
+## Bibliography auxiliary files (bibtex/biblatex/biber):
+*.bbl
+*.bcf
+*.blg
+*-blx.aux
+*-blx.bib
+*.run.xml
+
+## Build tool auxiliary files:
+*.fdb_latexmk
+*.synctex
+*.synctex(busy)
+*.synctex.gz
+*.synctex.gz(busy)
+*.pdfsync
+
+## Intermediate documents:
+*.dvi
+*.xdv
+*-converted-to.*
+
+## Executables:
 *.exe
-*.zip
 *.out
 *.class
-*.fasta
-!.gitkeep
+
+## Binaries:
+*.zip
+
+## VSCode Settings Files:
 .vscode/*
+
+## Gitkeep
+!.gitkeep
+
+## Non Synced support folder for other peoples codes:
 /support/*
-!support/.gitkeep

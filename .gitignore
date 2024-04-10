@@ -38,9 +38,10 @@
 *.out
 *.class
 
-## Binaries:
+## Erzeugte Dateien:
 *.zip
 *.pdf
+*.html
 
 ## VSCode Settings Files:
 .vscode/*

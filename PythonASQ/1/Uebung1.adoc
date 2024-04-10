@@ -1,0 +1,90 @@
+= Abgabe Justus Dreßler
+:source-highlighter: highlight.js
+
+== 1 Interpreter vs Compiler
+
+Im wesentlichen ist der Unterschied einer interpretierten Sprache wie Python im Vergleich zu einer kompilierten wie C, dass die Maschinenanweisungen erst während des Ausführens des Programmes erstellt werden.
+Das heißt im Fall von Python das ein Programm den Python Code einließt und beim laufen des Programms Zeile für Zeile den passenden Maschinencode erzeugt.
+Eine kompilierte Sprache kann dagegen typischerweise nur auf einer Hardware/Software Kombination eingesetzt werden (bspw. X86-64 Windows) und je nach Einstellungen vll. sogar nur bestimmte Prozessoren (bspw. nur Intel 13th Gen), da die Maschinencode Instruktionen und Systemaufrufe nicht in verschiedenen Softwaren und Hardwaren gleich sind.
+Dieser Nachteil kompilierter Sprachen ist aber gleichzeitig ein großer Vorteil wenn Wert auf Performanz gelegt wird.
+Da schneiden kompilierte Sprachen zumeist deutlich besser ab, da sie beim Ausführen nicht erst den Maschinencode generieren müssen.
+Einige interpretierte Sprachen versuchen diesen Nachteil durch Just-in-Time Compiler kompensieren, diese kompilieren den Code zwar immer noch erst auf der Zielmaschine, aber schon bevor die Zeile in der Ausführung erreicht wird.
+
+== 2 Python-Skripte ausführen
+
+----
+❯ python3 /root/github/University-Homework/PythonASQ/1/01_skript.py
+Hallo! Ich bin (wahrscheinlich) das erste Pythonskript welches du direkt auf der Kommandozeile ausgeführt hast!
+----
+Standard Python Programm, wird executed wie erwartet.
+
+----
+❯ python3 /root/github/University-Homework/PythonASQ/1/02_skript.docx 
+/usr/bin/python3: can't find '__main__' module in '/root/github/University-Homework/PythonASQ/1/02_skript.docx'
+----
+
+Sieht nur in Word aus wie eine einfache Textdatei, ist aber eigentlich .docx und damit eine Sammlung gezippter XML Dateien, die vom Python interpreter daher nicht verstanden werden (der Interpreter kann die Files nicht einfach entpacken und selbst dann wären die XML Dateien kein valides Python), siehe:
+
+[source,XML]
+----
+<w:p w14:paraId="51DE56D6" w14:textId="1293FCB5" w:rsidR="00DE4709" w:rsidRPr="00754132"
+            w:rsidRDefault="00754132">
+            <w:r w:rsidRPr="00754132">
+                <w:t xml:space="preserve">print(‘Ich sehe zwar </w:t>
+            </w:r>
+            <w:r>
+                <w:t xml:space="preserve">auf den ersten Blick </w:t>
+            </w:r>
+            <w:r w:rsidRPr="00754132">
+                <w:t>wie ein Pythonskript aus, bin aber keins</w:t>
+            </w:r>
+            <w:r>
+                <w:t>.</w:t>
+            </w:r>
+            <w:r w:rsidRPr="00754132">
+                <w:t>’)</w:t>
+            </w:r>
+        </w:p>
+----
+
+----
+❯ python3 /root/github/University-Homework/PythonASQ/1/03_skript.txt 
+Da ich eine einfache Textdatei bin, erkennt der Pythoninterpreter auch ohne die Dateiendung ".py", dass ich ein Pythonskript bin.
+----
+
+Hier fehlt zwar die .py Endung aber das File ist immer noch valider Python Code und kann somit ausgeführt werden. Das zeigt das Fileendungen meist nur Schall und Rauch sind, solange die Daten im gleichen Format gespeichert sind.
+
+Bonus: 03_skript.txt ohne # vor dem Kommentar:
+
+----
+❯ python3 /root/github/University-Homework/PythonASQ/1/03_skript.txt 
+  File "/root/github/University-Homework/PythonASQ/1/03_skript.txt", line 3
+    <-- Entferne Mal hier vorne das Kommentarsymbol (die Raute bzw. das Hashtag), speichere die Datei und führe sie nochmal aus. Was passiert?
+    ^
+SyntaxError: invalid syntax
+----
+
+Ohne Raute wird hier einfach ein Syntaxfehler geworfen, weil der Kommentar jetzt als Python Code erkannt wird, aber nicht interpretiert werden kann.
+
+== 3 Variablenzuweisung
+
+[%header]
+|===
+|Anweisung|x|y| z
+|x=y=1    |1|1| -
+|x=2      |2|1| -
+|z=2      |2|1| 2
+|z=2*3    |2|1| 6
+|x,y=1,6  |1|6| 6
+|y=6/2    |1|3.0| 6
+|z,x=3.0,6|6|3.0|3.0
+|x="y"    |"y"|3.0|3.0
+|===
+
+== 4 Variablentypen
+
+* Char => Darstellung einzelner Buchstaben
+* Float/Double => Darstellung von rationalen Zahlen
+* Boolean => Wahrheitswerte darstellen  (und das schöner als Ints dafür zu nutzen mit 0 = False, Else True)
+* Arrays / Lists => Datenreihen verarbeiten & Speichern können
+* generische Objekte als Key Value Paare die rekursiv definiert sein können => komplexere Sachverhalte in einer Variable zusammen fassen können

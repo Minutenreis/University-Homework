@@ -1,0 +1,3 @@
+print('Da ich eine einfache Textdatei bin, erkennt der Pythoninterpreter auch ohne die Dateiendung ".py", dass ich ein Pythonskript bin.')
+
+# <-- Entferne Mal hier vorne das Kommentarsymbol (die Raute bzw. das Hashtag), speichere die Datei und führe sie nochmal aus. Was passiert?

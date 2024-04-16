@@ -1,0 +1,43 @@
+= 2. Übung
+
+== 1 Python-Literale
+
+----
+2e + 1j → error, da hinter e keine Zahl steht und damit nicht als Exponent interpretiert werden kann (wolltet ihr es zusammenschreiben?)
+1.000e - 0.2 → same thing (wolltet ihr die zusammengeschrieben haben?)
+0o237 → 159 (Oktalzahl)
+0x123 → 291 (Hexadezimalzahl)
+00x123 → error, da 00x keine gültiger Zahlentyp ist und sonst kein x in einer Zahl stehen darf
+’zwei” → error, da ihr ’ statt ' verwendet ... wäre aber auch so mismatched
+”Körpergröße” → error, da die ihr ” statt " verwendet ... sonst korrekt
+b”Körpergröße” → error, da ihr b” statt b" verwendet ... sonst error da non ascii Zeichen in der Zeichenkette sind
+00023e001 → 230.0 (23 * 10**1)
+(1;2;3) → error da Semikolon statt Kommata
+{[1,2,3]: (1,2,3)} → error da key hashable sein muss (liste ist aber veränderbar)
+{(1,2,3): [1,2,3]} → klappt (tuple ist hashable)
+----
+
+== 2 Ausdrücke
+
+----
+10%7 → 3
+1 + 1.0 → 2.0
+5//2.0 → 2.0 (da // float zurückgibt, wenn einer der Operanden float ist)
+3 ∗ (1.0/2) → error da ∗ statt * verwendet
+int(”10”) ∗0o2 → error da ” statt " verwendet wird
+int(”10”, 2) ∗2 → error da ” statt " verwendet wird
+0x10 + 0x20 → 48
+(1, 2) + (3, 4) → (1, 2, 3, 4)
+[1, 2] + (3, 4) → error da Liste und Tuple nicht konkattiniert werden können
+[1, 2] + [(3, 4)] → [1, 2, (3, 4)] (Tuple darf aber Element einer Liste sein)
+”2” + ”3” → error da ” statt " verwendet wird
+(1, 2) + 3 → error da Tuple und int nicht konkattiniert werden können
+float(1//2) → 0.0
+str(2+3.0) → '5.0'
+str(complex(1))  → '(1+0j)'
+int(complex(1)) → error da complex nicht in int umgewandelt werden kann
+list(str(12345)) → ['1', '2', '3', '4', '5']
+True + 1 → 2
+----
+
+== 3 ISBN Prüfziffer

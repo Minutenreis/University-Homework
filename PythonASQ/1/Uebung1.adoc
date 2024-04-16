@@ -1,4 +1,4 @@
-= Abgabe Justus Dreßler
+= 1. Übung
 :source-highlighter: highlight.js
 
 == 1 Interpreter vs Compiler

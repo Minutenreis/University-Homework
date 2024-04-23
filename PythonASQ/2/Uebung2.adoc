@@ -39,5 +39,3 @@ int(complex(1)) → error da complex nicht in int umgewandelt werden kann
 list(str(12345)) → ['1', '2', '3', '4', '5']
 True + 1 → 2
 ----
-
-== 3 ISBN Prüfziffer

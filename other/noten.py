@@ -32,6 +32,7 @@ noten = [
     (1.0,4), # Deklarative Programmierung 
     (1.0,3), # Seminar Software- und Informationssysteme 
     (1.3,6), # Grundlagen der Informations- und Softwaresysteme 
+    (1.3,4), # Kryptologie LAB
     (1.0,6), # Kryptologie
     (1.3,6), # Projekt - Paralleles Rechnen 
     (1.0,6), # Parallel Computing I  

@@ -42,6 +42,8 @@
 *.zip
 *.pdf
 *.html
+__pycache__/
+*.py[cod]
 
 ## VSCode Settings Files:
 .vscode/*

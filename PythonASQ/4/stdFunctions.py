@@ -51,23 +51,58 @@ def median(*numbers: tuple[float]) -> float:
     else:
         return quickSelct(numbers, 0, len(numbers) - 1, len(numbers) // 2)
 
-def range(start:int, stop:int = None, step:int = 1) -> list[int]:
-    """Returns a list of numbers from start to stop with the given step."""
-    if step == 0:
-        raise ValueError("Step must not be zero")
-    if stop == None:
-        stop = start
-        start = 0
-    if start > stop and step > 0:
-        return []
-    if start < stop and step < 0:
-        return []
-    numbers = []
-    while start < stop and step > 0 or start > stop and step < 0:
-        numbers.append(start)
-        start += step
-    return numbers
+# def range(start:int, stop:int = None, step:int = 1) -> list[int]:
+#     """Returns a list of numbers from start to stop with the given step."""
+#     if step == 0:
+#         raise ValueError("Step must not be zero")
+#     if stop == None:
+#         stop = start
+#         start = 0
+#     if start > stop and step > 0:
+#         return []
+#     if start < stop and step < 0:
+#         return []
+#     numbers = []
+#     while start < stop and step > 0 or start > stop and step < 0:
+#         numbers.append(start)
+#         start += step
+#     return numbers
 
-x = 1000.0
+class Range:
+    curr = 0;
+    stop = 0;
+    step = 1;
+    
+    def __init__(self, start:int, stop:int = None, step:int = 1) -> list[int]:
+        """Returns a list of numbers from start to stop with the given step."""
+        if step == 0:
+            raise ValueError("range() arg 3 must not be zero")
+        if stop == None:
+            self.stop = start
+            self.curr = 0
+        else:
+            self.curr = start
+            self.stop = stop
+        self.step = step
+    
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        if self.curr >= self.stop and self.step > 0 or self.curr <= self.stop and self.step < 0:
+            raise StopIteration
+        val = self.curr
+        self.curr += self.step
+        return val
+    
+    def __repr__(self):
+        return "range(" + str(self.start) + ", " + str(self.stop) + ", " + str(self.step) + ")"
+        
+def range(start:int, stop:int = None, step:int = 1) -> Range:
+    return Range(start, stop, step)
+
+x = range(10, 3, -4)
+for i in x:
+    print(i)
 
     

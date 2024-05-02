@@ -51,22 +51,22 @@ def median(*numbers: tuple[float]) -> float:
     else:
         return quickSelct(numbers, 0, len(numbers) - 1, len(numbers) // 2)
 
-# def range(start:int, stop:int = None, step:int = 1) -> list[int]:
-#     """Returns a list of numbers from start to stop with the given step."""
-#     if step == 0:
-#         raise ValueError("Step must not be zero")
-#     if stop == None:
-#         stop = start
-#         start = 0
-#     if start > stop and step > 0:
-#         return []
-#     if start < stop and step < 0:
-#         return []
-#     numbers = []
-#     while start < stop and step > 0 or start > stop and step < 0:
-#         numbers.append(start)
-#         start += step
-#     return numbers
+def range_control(start:int, stop:int = None, step:int = 1) -> list[int]:
+    """Returns a list of numbers from start to stop with the given step."""
+    if step == 0:
+        raise ValueError("Step must not be zero")
+    if stop == None:
+        stop = start
+        start = 0
+    if start > stop and step > 0:
+        return []
+    if start < stop and step < 0:
+        return []
+    numbers = []
+    while start < stop and step > 0 or start > stop and step < 0:
+        numbers.append(start)
+        start += step
+    return numbers
 
 class Range:
     curr = 0;

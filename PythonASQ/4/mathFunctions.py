@@ -43,6 +43,3 @@ def sin(x: float) -> float:
         sum += potenz(-1, n) * potenz(x, 2 * n+1) / fakultät(2 * n+1)
         n += 1
     return round(sum,10)
-# ToDo: Beschweren dass in der VL die Definition des Cosinus gegeben wurde
-
-print(sin(2))

@@ -13,14 +13,3 @@ def ulam(a):
             a = 3 * a + 1
         print(a)
     return a
-
-
-n=1000000
-def test(zahl: int):
-    print(id(zahl))
-    zahl = zahl // 2
-    print(id(zahl))
-print(id(n))
-test(n)
-print(n)
-# https://stackoverflow.com/a/986145

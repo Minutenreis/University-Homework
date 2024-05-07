@@ -32,5 +32,3 @@ def verstecken(s: str, n = 1) -> str:
             string += randomChar
 
     return string
-
-print(verstecken("Hallo", 3))

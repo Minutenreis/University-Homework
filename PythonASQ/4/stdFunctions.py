@@ -73,16 +73,10 @@ class RangeIterator:
     stop = 0;
     step = 1;
     
-    def __init__(self, start:int, stop:int = None, step:int = 1) -> list[int]:
+    def __init__(self, start:int, stop:int, step:int):
         """Returns a list of numbers from start to stop with the given step."""
-        if step == 0:
-            raise ValueError("range() arg 3 must not be zero")
-        if stop == None:
-            self.stop = start
-            self.curr = 0
-        else:
-            self.curr = start
-            self.stop = stop
+        self.start = start
+        self.stop = stop
         self.step = step
     
     def __next__(self):
@@ -93,9 +87,9 @@ class RangeIterator:
         return val
 
 class Range:
-    start = 0;
-    stop = 0;
-    step = 1;
+    start = 0
+    stop = 0
+    step = 1
     
     def __init__(self, start:int, stop:int = None, step:int = 1) -> list[int]:
         """Returns a list of numbers from start to stop with the given step."""

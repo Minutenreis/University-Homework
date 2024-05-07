@@ -6,9 +6,3 @@ def rekursion(n=0):
         return n
 
 print(rekursion())
-
-def Range2(n):
-    i = 0
-    while i < n:
-        yield i
-        i += 1

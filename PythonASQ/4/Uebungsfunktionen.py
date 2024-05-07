@@ -27,7 +27,7 @@ def verstecken(s: str, n = 1) -> str:
     string = ""
     for char in s:
         string += char
-        for i in range(n):
+        for _ in range(n):
             randomChar = chr(random.randint(65,90))
             string += randomChar
 

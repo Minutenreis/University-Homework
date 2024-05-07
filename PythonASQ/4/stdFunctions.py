@@ -93,7 +93,7 @@ class RangeIterator:
         return val
 
 class Range:
-    curr = 0;
+    start = 0;
     stop = 0;
     step = 1;
     
@@ -103,25 +103,17 @@ class Range:
             raise ValueError("range() arg 3 must not be zero")
         if stop == None:
             self.stop = start
-            self.curr = 0
+            self.start = 0
         else:
-            self.curr = start
+            self.start = start
             self.stop = stop
         self.step = step
     
     def __iter__(self):
-        return RangeIterator(self.curr, self.stop, self.step)
+        return RangeIterator(self.start, self.stop, self.step)
     
     def __repr__(self):
         return "range(" + str(self.start) + ", " + str(self.stop) + ", " + str(self.step) + ")"
         
 def range(start:int, stop:int = None, step:int = 1) -> Range:
     return Range(start, stop, step)
-
-x = range(10, 3, -2)
-for i in x:
-    print(i)
-print()
-for i in x:
-    print(i)
-    

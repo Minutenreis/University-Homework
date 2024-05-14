@@ -44,6 +44,10 @@
 *.html
 __pycache__/
 *.py[cod]
+PythonASQ/6/voll/*
+PythonASQ/6/*.txt
+PythonASQ/6/*.json
+PythonASQ/6/*.pickle
 
 ## VSCode Settings Files:
 .vscode/*

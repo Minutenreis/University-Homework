@@ -44,9 +44,8 @@ def printSkat(skatDeck: list[tuple[str,str]]):
         "Reset": "\033[0m"
     }
     print("[", end="")
-    for i in range(len(skatDeck)):
-        col = skatDeck[i][0]
-        val = skatDeck[i][1]
+    for i, card in enumerate(skatDeck):
+        col, val = card
         print(colourTerminal[col]+colourToSymbol[col]+valueToShortform[val]+colourTerminal["Reset"], end="," if i != len(skatDeck)-1 else "]\n")
     
         
@@ -55,9 +54,9 @@ iterator = skatGen()
 
 skatDeck = list(skatGen())
 printSkat(skatDeck)
-start = time.time()
+start = time.perf_counter()
 shuffle(skatDeck,1_000_000)
-end = time.time()
+end = time.perf_counter()
 printSkat(skatDeck)
 print('time taken for shuffling',end-start, 's')
 

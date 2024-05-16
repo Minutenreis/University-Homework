@@ -18,12 +18,12 @@ def load_list(path: str) -> list:
         elif type == "float":
             result.append(float(value))
         elif type == "bool":
-            result.append(bool(value))
+            result.append(value == str(True))
         elif type == "NoneType":
             result.append(None)
     return result
 
 # Test the functions
-list = ["str\n\t\r", 1, 1.0, True, None]
+list = ["str\n\t\r", 1, 1.0, True, False, None]
 save_list(list, "Test.txt")
 print(load_list("Test.txt"))

@@ -30,7 +30,7 @@ def partition(numbers: list[float], left: int, right: int, pivotIndex: int) -> i
     numbers[storeIndex], numbers[right] = numbers[right], numbers[storeIndex]
     return storeIndex
 
-def quickSelct(numbers: list[float], left: int, right: int, k:int) -> float:
+def quickSelect(numbers: list[float], left: int, right: int, k:int) -> float:
     while True:
         if left == right:
             return numbers[left]
@@ -47,9 +47,9 @@ def median(*numbers: tuple[float]) -> float:
     """Returns the median of the given numbers."""
     numbers = list(numbers)
     if(len(numbers) % 2 == 0):
-        return (quickSelct(numbers, 0, len(numbers) - 1, len(numbers) // 2 - 1) + quickSelct(numbers, 0, len(numbers) - 1, len(numbers) // 2)) / 2
+        return (quickSelect(numbers, 0, len(numbers) - 1, len(numbers) // 2 - 1) + quickSelect(numbers, 0, len(numbers) - 1, len(numbers) // 2)) / 2
     else:
-        return quickSelct(numbers, 0, len(numbers) - 1, len(numbers) // 2)
+        return quickSelect(numbers, 0, len(numbers) - 1, len(numbers) // 2)
 
 def range_control(start:int, stop:int = None, step:int = 1) -> list[int]:
     """Returns a list of numbers from start to stop with the given step."""

@@ -1,0 +1,101 @@
+Messgerät;Person;Wert;Datum
+Laser;Daniel;78.81;September 2022
+Nicht-Laser;Bernd;35.137;Mai 2022
+laser;Carina;28.961;Juni 2022
+laser;Carina;77.821;September 2022
+Thermometer;Ada;99.827;April 2022
+Radiometer;Bernd;16.374;Oktober 2022
+Laser;Ada;7.957;April 2022
+Thermometer;Daniel;49.587;Juni 2022
+Radiometer;Ada;82.495;September 2022
+Nicht-Laser;Ada;69.715;September 2022
+laser;Ada;14.302;August 2022
+Laser;Ada;56.802;September 2022
+Laser;Daniel;80.408;Oktober 2022
+RADIOMETER;Carina;41.669;Oktober 2022
+Laser;Daniel;99.562;Juli 2022
+  Laser;Daniel;53.408;Mai 2022
+Thermometer;Carina;39.962;April 2022
+  Laser;Ada;8.428;Juli 2022
+  Laser;Ada;50.972;Juli 2022
+Thermometer;Carina;51.702;Mai 2022
+Laser;Bernd;21.512;August 2022
+Nicht-Laser;Carina;0.629;Juli 2022
+  Laser;Daniel;61.1;Juni 2022
+Nicht-Laser;Carina;9.71;Mai 2022
+Laser;Bernd;90.909;September 2022
+  Laser;Carina;95.969;Oktober 2022
+  Laser;Bernd;17.973;Mai 2022
+laser;Ada;92.012;April 2022
+RADIOMETER;Daniel;80.884;Oktober 2022
+Laser;Carina;15.387;Oktober 2022
+  Laser;Carina;2.937;Juli 2022
+Laser;Carina;81.282;August 2022
+RADIOMETER;Bernd;12.481;April 2022
+Laser;Daniel;31.094;Juni 2022
+Laser;Daniel;83.728;September 2022
+laser;Ada;17.7;Oktober 2022
+Laser;Bernd;91.541;August 2022
+Nicht-Laser;Ada;18.181;Oktober 2022
+Laser;Carina;22.92;Mai 2022
+Thermometer;Carina;3.778;April 2022
+Nicht-Laser;Carina;49.578;Juli 2022
+Laser;Carina;18.453;Mai 2022
+RADIOMETER;Daniel;23.797;September 2022
+Nicht-Laser;Daniel;46.85;September 2022
+Nicht-Laser;Bernd;21.231;April 2022
+Laser;Carina;38.861;Juni 2022
+Laser;Carina;45.912;August 2022
+Thermometer;Daniel;13.302;April 2022
+Radiometer;Carina;99.716;Oktober 2022
+Laser;Bernd;23.835;September 2022
+Nicht-Laser;Ada;20.515;Oktober 2022
+Laser;Bernd;44.697;September 2022
+RADIOMETER;Ada;48.734;Juli 2022
+Thermometer;Ada;66.329;Juli 2022
+RADIOMETER;Ada;73.328;Juni 2022
+Radiometer;Carina;98.661;Juli 2022
+Radiometer;Bernd;29.362;Oktober 2022
+Nicht-Laser;Bernd;53.527;Oktober 2022
+Thermometer;Daniel;14.161;August 2022
+Laser;Daniel;48.571;Oktober 2022
+  Laser;Bernd;40.307;April 2022
+laser;Carina;11.565;Oktober 2022
+  Laser;Ada;78.434;Juli 2022
+Laser;Ada;46.71;April 2022
+Laser;Daniel;30.594;September 2022
+Thermometer;Bernd;66.613;Juni 2022
+laser;Ada;46.786;Juli 2022
+  Laser;Daniel;92.15;August 2022
+Radiometer;Ada;54.627;Oktober 2022
+RADIOMETER;Carina;47.744;September 2022
+Thermometer;Carina;52.389;Juni 2022
+  Laser;Daniel;4.52;Mai 2022
+Nicht-Laser;Daniel;77.856;August 2022
+  Laser;Daniel;12.592;Juli 2022
+Radiometer;Daniel;12.856;September 2022
+Thermometer;Carina;51.758;Mai 2022
+RADIOMETER;Bernd;71.181;Juli 2022
+Thermometer;Ada;10.021;Juli 2022
+RADIOMETER;Bernd;57.686;Oktober 2022
+RADIOMETER;Bernd;22.956;Juni 2022
+laser;Carina;97.562;Mai 2022
+Radiometer;Daniel;27.535;Juni 2022
+RADIOMETER;Ada;6.026;Oktober 2022
+Thermometer;Carina;3.263;Juni 2022
+Radiometer;Daniel;94.641;April 2022
+Laser;Carina;53.757;April 2022
+Nicht-Laser;Ada;85.812;April 2022
+Radiometer;Carina;18.378;Oktober 2022
+Laser;Carina;64.531;April 2022
+Thermometer;Daniel;3.282;April 2022
+Thermometer;Carina;70.526;Mai 2022
+Nicht-Laser;Ada;78.16;Juli 2022
+laser;Ada;6.929;Oktober 2022
+laser;Daniel;66.422;August 2022
+  Laser;Ada;39.047;Juni 2022
+Nicht-Laser;Carina;46.967;August 2022
+laser;Ada;14.851;Juni 2022
+Radiometer;Carina;10.511;Juni 2022
+laser;Carina;51.937;April 2022
+Laser;Carina;85.081;Juli 2022

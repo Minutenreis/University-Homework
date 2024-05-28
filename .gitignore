@@ -48,6 +48,7 @@ PythonASQ/6/voll/*
 PythonASQ/6/*.txt
 PythonASQ/6/*.json
 PythonASQ/6/*.pickle
+PythonASQ/8/beispieldaten/*.csv
 
 ## VSCode Settings Files:
 .vscode/*

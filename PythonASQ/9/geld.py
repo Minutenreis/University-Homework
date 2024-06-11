@@ -41,7 +41,7 @@ class Geld:
     def __init__(self, value = 0, currency = 'EUR'):
         if currency not in Geld.exchange_rates():
             raise ValueError('Unbekannte Währung')
-        self.value = value
+        self.__value = value
         self.__currency = currency
         
     def change_currency(self, new_currency):
@@ -58,7 +58,7 @@ class Geld:
     def sub(self, other):
         if type(other) != Geld:
             raise TypeError('Nur Geld kann von Geld subtrahiert werden')
-        self.value -= other.valueInEuro() * Geld.exchange_rates()[self.__currency]
+        self.__value -= other.valueInEuro() * Geld.exchange_rates()[self.__currency]
     
     def valueInEuro(self):
         return self.__value / Geld.exchange_rates()[self.__currency]

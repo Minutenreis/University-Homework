@@ -17,7 +17,6 @@ if len(sys.argv) != 3:
 
 file1 = sys.argv[1]
 file2 = sys.argv[2]
-usedMemory = 0
 sharedList = []
 
 with open(file1, "r") as f:
@@ -42,8 +41,8 @@ mergedList.append(sharedList[0])
 for i in range(1, len(sharedList)):
     shared_list_i = sharedList[i].split()
     merged_list_min_1 = mergedList[-1].split()
-    if shared_list_i[0] == merged_list_min_1[0] and shared_list_i[1] <= merged_list_min_1[2]:
-        mergedList[-1] = f"{merged_list_min_1[0]}\t{merged_list_min_1[1]}\t{shared_list_i[2]}\t{merged_list_min_1[3]}{shared_list_i[3]}\n"
+    if shared_list_i[0] == merged_list_min_1[0] and int(shared_list_i[1]) <= int(merged_list_min_1[2]):
+        mergedList[-1] = f"{merged_list_min_1[0]}\t{merged_list_min_1[1]}\t{max(int(shared_list_i[2]),int(merged_list_min_1[2]))}\t{merged_list_min_1[3]}{shared_list_i[3]}\n"
     else:
         mergedList.append(sharedList[i])
 

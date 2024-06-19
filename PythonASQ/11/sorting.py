@@ -98,34 +98,35 @@ def quickSort(A: list, lo = 0, hi = None):
     
     return A
 
-n = 1000
-testList = randList.make_random_list_choices(n)
-
-testListInsertion = testList.copy()
-testListInsertionBinary = testList.copy()
-testListSelection = testList.copy()
-testListMergeSort = testList.copy()
-testListQuickSort = testList.copy()
-
-laufzeitInsertion = timeit.timeit(lambda: insertionSort(testListInsertion), globals=globals(), number=1)
-laufzeitInsertionBinary = timeit.timeit(lambda: binaryInsertionSort(testListInsertionBinary), globals=globals(), number=1)
-laufzeitSelection = timeit.timeit(lambda: selectionSort(testListSelection), globals=globals(), number=1)
-laufzeitQuickSort = timeit.timeit(lambda: quickSort(testListQuickSort), globals=globals(), number=1)
-laufzeitMergeSort = timeit.timeit(lambda: mergeSort(testListMergeSort), globals=globals(), number=1)
-laufzeitPowerSort = timeit.timeit(lambda: testList.sort(), globals=globals(), number=1)
-
-print(f"InsertionSort: {laufzeitInsertion}s")
-print(f"BinaryInsertionSort: {laufzeitInsertionBinary}s")
-print(f"SelectionSort: {laufzeitSelection}s")
-print(f"QuickSort: {laufzeitQuickSort}s")
-print(f"MergeSort: {laufzeitMergeSort}s")
-print(f"PowerSort: {laufzeitPowerSort}s") # assumes at least Python 3.11
-
-"""
-PowerSort << Quicksort < MergeSort << BinaryInsertionSort << InsertionSort < SelectionSort
-"""
-
-# profile.run("insertionSort(testListInsertion)", sort="ncalls")
-# profile.run("binaryInsertionSort(testListInsertionBinary)", sort="ncalls")
-# profile.run("selectionSort(testListSelection)", sort="ncalls")
+if __name__ == "__main__":
+    n = 1000
+    testList = randList.make_random_list_choices(n)
+    
+    testListInsertion = testList.copy()
+    testListInsertionBinary = testList.copy()
+    testListSelection = testList.copy()
+    testListMergeSort = testList.copy()
+    testListQuickSort = testList.copy()
+    
+    laufzeitInsertion = timeit.timeit(lambda: insertionSort(testListInsertion), globals=globals(), number=1)
+    laufzeitInsertionBinary = timeit.timeit(lambda: binaryInsertionSort(testListInsertionBinary), globals=globals(), number=1)
+    laufzeitSelection = timeit.timeit(lambda: selectionSort(testListSelection), globals=globals(), number=1)
+    laufzeitQuickSort = timeit.timeit(lambda: quickSort(testListQuickSort), globals=globals(), number=1)
+    laufzeitMergeSort = timeit.timeit(lambda: mergeSort(testListMergeSort), globals=globals(), number=1)
+    laufzeitPowerSort = timeit.timeit(lambda: testList.sort(), globals=globals(), number=1)
+    
+    print(f"InsertionSort: {laufzeitInsertion}s")
+    print(f"BinaryInsertionSort: {laufzeitInsertionBinary}s")
+    print(f"SelectionSort: {laufzeitSelection}s")
+    print(f"QuickSort: {laufzeitQuickSort}s")
+    print(f"MergeSort: {laufzeitMergeSort}s")
+    print(f"PowerSort: {laufzeitPowerSort}s") # assumes at least Python 3.11
+    
+    """
+    PowerSort << Quicksort < MergeSort << BinaryInsertionSort << InsertionSort < SelectionSort
+    """
+    
+    # profile.run("insertionSort(testListInsertion)", sort="ncalls")
+    # profile.run("binaryInsertionSort(testListInsertionBinary)", sort="ncalls")
+    # profile.run("selectionSort(testListSelection)", sort="ncalls")
 

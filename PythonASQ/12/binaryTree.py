@@ -215,7 +215,9 @@ class Graph:
 
     def isConnected(self):
         visited = set()
-        queue = [next(iter(self.nodes))]
+        if not self.nodes:
+            raise ValueError('Graph is empty')
+        queue = [list(self.nodes.values())[0]]
         while queue:
             node = queue.pop()
             visited.add(node)
@@ -432,12 +434,15 @@ def generateGraph(n: int, i: int, j: int)-> Graph:
     graph = Graph()
     for k in range(n):
         graph.add_node(str(k), random.randint(i,j))
+    allNodes = set(graph.nodes)
     for node in graph.nodes.values():
-        # at least n/2 edges ensures a connected graph
-        for _ in range(random.randint(math.ceil(n/2),n)):
-            node2 = random.choice(list(graph.nodes.values()))
-            if node2 != node and node2 not in node.edges:
-                graph.add_edge(node.name, node2.name, random.randint(i,j))
+        currentEdges = set(map(lambda n: n.name, node.edges))
+        nEdges = len(currentEdges)
+        edgesToCreate = math.ceil(n/2)-nEdges
+        possibleEdges = sorted(allNodes - currentEdges - {node.name})
+        newEdges = random.sample(possibleEdges, edgesToCreate)
+        for edge in newEdges:
+            graph.add_edge(node.name, edge, random.randint(i,j))
     return graph
 
 def greedySearch(graph: Graph, start: str, end: str):
@@ -608,26 +613,45 @@ class Binärbaum(Graph):
         self.remove_node(node.name)
     
     
-graph = generateGraph(4, 1, 4)
-for node in graph.nodes.values():
-    print(node.name, list(map(lambda n: (n.name, graph.get_edge_weight(node.name,n.name)),node.edges)))
-print(graph.bfs(3))
-print(graph.dfs(3))
-print(greedySearch(graph, '0', '3'))
-print(dijkstra(graph,'0','3'))
+# graph = generateGraph(4, 1, 4)
+# for node in graph.nodes.values():
+#     print(node.name, list(map(lambda n: (n.name, graph.get_edge_weight(node.name,n.name)),node.edges)))
+# print(graph.bfs(3))
+# print(graph.dfs(3))
+# print(greedySearch(graph, '0', '3'))
+# print(dijkstra(graph,'0','3'))
 
-baum = Binärbaum()
-baum.build([0,1,2,3,4,5,6])
-print(baum.search(1))
-for node in baum.nodes.values():
-    print(node.name, node.value, node.edges)
-baum.insert(7)
-print()
-for node in baum.nodes.values():
-    print(node.name, node.value, node.edges)
-baum.remove(2)
-baum.remove(1)
-print()
-for node in baum.nodes.values():
-    print(node.name, node.value, node.edges)
+# baum = Binärbaum()
+# baum.build([0,1,2,3,4,5,6])
+# print(baum.search(1))
+# for node in baum.nodes.values():
+#     print(node.name, node.value, node.edges)
+# baum.insert(7)
+# print()
+# for node in baum.nodes.values():
+#     print(node.name, node.value, node.edges)
+# baum.remove(2)
+# baum.remove(1)
+# print()
+# for node in baum.nodes.values():
+#     print(node.name, node.value, node.edges)
 
+
+import time
+
+n = 4000
+
+# generate Graph
+start = time.perf_counter()
+graph = generateGraph(n, 1, n//10)
+print("Graph generated in", time.perf_counter() - start, "seconds")
+
+# dijkstra
+start = time.perf_counter()
+print(dijkstra(graph, '0', str(n-1))[0])
+print(time.perf_counter() - start)
+
+# greedySearch
+start = time.perf_counter()
+print(greedySearch(graph, '0', str(n-1))[0])
+print(time.perf_counter() - start)

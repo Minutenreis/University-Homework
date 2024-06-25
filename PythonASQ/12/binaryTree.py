@@ -183,7 +183,7 @@ class Graph:
             return True
         raise ValueError('key must be a string, a Graph.Node or a list of edges')
     
-    def breadthSearch(self, value: int ,startNode: Node = None) -> Node:
+    def bfs(self, value: int ,startNode: Node = None) -> Node:
         if startNode is None:
             startNode = self.nodes[next(iter(self.nodes))]
         queue = [startNode]
@@ -197,6 +197,32 @@ class Graph:
                 if edge.name not in visitedNames:
                     queue.append(edge)
         return None
+    
+    def dfs(self, value: int ,startNode: Node = None) -> Node:
+        if startNode is None:
+            startNode = self.nodes[next(iter(self.nodes))]
+        queue = [startNode]
+        visitedNames = set()
+        while queue:
+            node = queue.pop()
+            if node.value == value:
+                return node
+            visitedNames.add(node.name)
+            for edge in node.edges:
+                if edge.name not in visitedNames:
+                    queue.append(edge)
+        return None
+
+    def isConnected(self):
+        visited = set()
+        queue = [next(iter(self.nodes))]
+        while queue:
+            node = queue.pop()
+            visited.add(node)
+            for edge in node.edges:
+                if edge not in visited:
+                    queue.append(edge)
+        return len(visited) == len(self.nodes)
 
 # Meckerbemerkung: es wäre viel sinnvoller gewesen einen Bidirektionalen Graphen
 # als Spezialfall eines Gerichteten Graphen zu implementieren
@@ -415,11 +441,15 @@ def generateGraph(n: int, i: int, j: int)-> Graph:
     return graph
 
 def greedySearch(graph: Graph, start: str, end: str):
+    if start not in graph or end not in graph:
+        raise ValueError('Knoten nicht vorhanden')
+    start = graph[start]
+    end = graph[end]
     nodeOrder = [start]
     distance = []
     visited = set()
     while nodeOrder[-1] != end:
-        node = graph[nodeOrder[-1]]
+        node = nodeOrder[-1]
         visited.add(node.name)
         nextNode = None
         minWeight = float('inf')
@@ -432,9 +462,39 @@ def greedySearch(graph: Graph, start: str, end: str):
             nodeOrder.pop()
             distance.pop()
         else:
-            nodeOrder.append(nextNode.name)
+            nodeOrder.append(nextNode)
             distance.append(minWeight)
     return sum(distance), nodeOrder
+
+def dijkstra(graph: Graph, start: str, end: str):
+        if start not in graph.nodes or end not in graph.nodes:
+            raise ValueError('Knoten nicht vorhanden')
+        start = graph[start]
+        end = graph[end]
+        if start == end:
+            return 0, [start]
+        distances = {node: float('inf') for node in graph.nodes.values()}
+        distances[start] = 0
+        Q = [start] # idealerweise MinHeap
+        visited = set()
+        previous = {node: None for node in graph.nodes.values()}
+        while Q:
+            node = min(Q, key=lambda n: distances[n])
+            visited.add(node)
+            Q.remove(node)
+            for edge in node.edges:
+                if edge not in visited:
+                    newDist = distances[node] + graph.get_edge_weight(node.name, edge.name)
+                    if newDist < distances[edge]:
+                        if distances[edge] == float('inf'):
+                            Q.append(edge)
+                        distances[edge] = newDist
+                        previous[edge] = node
+        path = [end]
+        while path[-1] != start:
+            path.append(previous[path[-1]])
+        path.reverse()
+        return distances[end], path
             
 class Binärbaum(Graph):
     def __init__(self, nodes : list[str] = None):
@@ -548,12 +608,13 @@ class Binärbaum(Graph):
         self.remove_node(node.name)
     
     
-# graph = generateGraph(4, 1, 10)
-# print(graph)
-# for node in graph.nodes.values():
-#     print(node.name, list(map(lambda n: (n.name, graph.get_edge_weight(node.name,n.name)),node.edges)))
-# print(graph.breadthSearch(5))
-# print(greedySearch(graph, '0', '3'))
+graph = generateGraph(4, 1, 4)
+for node in graph.nodes.values():
+    print(node.name, list(map(lambda n: (n.name, graph.get_edge_weight(node.name,n.name)),node.edges)))
+print(graph.bfs(3))
+print(graph.dfs(3))
+print(greedySearch(graph, '0', '3'))
+print(dijkstra(graph,'0','3'))
 
 baum = Binärbaum()
 baum.build([0,1,2,3,4,5,6])

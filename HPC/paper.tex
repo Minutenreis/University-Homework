@@ -3,7 +3,7 @@
 
 \begin{document}
 
-\title{MPI+OpenMP} %TODO: Add Title
+\title{MPI+OpenMP in MPI4.0}
 \author{Dreßler Justus}
 \orcid{0009-0005-0657-5854}
 \affiliation{
@@ -18,7 +18,17 @@
 
 \keywords{MPI, MPI+OpenMP,MPI+Threads}
 
-% TODO: insert CCSXML http://dl.acm.org/ccs.cfm
+\begin{CCSXML}
+    <ccs2012>
+    <concept>
+    <concept_id>10010147.10010169</concept_id>
+    <concept_desc>Computing methodologies~Parallel computing methodologies</concept_desc>
+    <concept_significance>500</concept_significance>
+    </concept>
+    </ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Computing methodologies~Parallel computing methodologies}
 
 \begin{abstract}
 
@@ -37,20 +47,42 @@
 
 \maketitle
 
-%TODO: Introduction
+% Introduction, roughly 1 page
+\section{Introduction}
 
-%TODO: Background?
+Supercomputing relies on multiple layers of parallelisation, one intranode and one internode.
+Historically this was handled fine with a MPI+MPI (or MPI-Everywhere) programming model.
+In modern supercomputing rising core counts neccessitates a more nuanced programming model, one that makes scaling across cores on a node easier.
+This caused MPI+OpenMP to become the new de facto standard programming model in Supercomputing.
+It simplifies the seperation of internode and intranode tasks greatly, but it also imposes new challenges for developers.
+This paper tries to summarize the current (MPI4.0) methods to overcome these challenges and unlock high performance MPI+OpenMP applications.
+% this feels like making a buzzword list
 
-%TODO: add content (preferably in a new tex document)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris dictum quam eget orci porttitor ultrices. Suspendisse purus nisl, dapibus et rhoncus in, eleifend id quam. Integer volutpat dolor urna, non auctor magna sodales non. Ut in fermentum erat, lacinia malesuada urna. Nullam et dolor ut purus fermentum rutrum. Suspendisse non velit sollicitudin, rutrum est at, commodo sem. Pellentesque viverra tincidunt mauris ut egestas. Integer vel orci sapien. Sed ut mi at lacus vehicula fermentum. Integer euismod vestibulum auctor. Nunc vulputate leo eget aliquam bibendum.
+\section{Motivation}
+% write why parallel communications is such a large burdon
 
-Etiam at cursus velit. Integer pellentesque, magna nec aliquet lobortis, sapien elit tempus ante, at eleifend eros risus sed dui. Suspendisse consectetur sed purus fermentum sollicitudin. Nam id sem et augue cursus luctus. Donec mauris neque, bibendum pellentesque fermentum sit amet, malesuada et augue. In ante enim, aliquam ac scelerisque id, blandit non massa. Donec placerat gravida ipsum et mattis. Cras scelerisque arcu in vulputate vehicula.
+% Body, roughly 2.5 pages
+\section{Parallel Communication in MPI4.0}
 
-Donec nunc tortor, dignissim vitae ultricies et, mollis at turpis. Ut bibendum sit amet magna rutrum condimentum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Morbi a vulputate velit. Suspendisse tellus est, ullamcorper in erat quis, iaculis aliquam diam. Aliquam pretium lobortis sollicitudin. In ac massa dictum, semper nisl id, condimentum ligula. Cras accumsan magna sed malesuada faucibus. Nulla in orci hendrerit, convallis tortor sed, vehicula nunc. Donec id magna bibendum, sodales purus non, congue neque. Quisque metus leo, lobortis ut metus a, dignissim lobortis felis.
+% focus on CPU parallelisation
+\subsection{Communicator}
+% see Presentation
+\subsection{Tags}
+% see Presentation
+\subsection{Partitioned Operations}
+% see Presentation
+\subsection{Sessions} %no MPI Endpoints, since they didn't make the cut for MPI4.0 and are thus not relevant to current parallelisation
 
-Fusce quis posuere metus, ac consequat diam. Donec sed venenatis nisl, in ultricies massa. Suspendisse feugiat vestibulum aliquam. Cras consequat venenatis feugiat. Morbi fermentum faucibus mauris eu rutrum. Sed eget scelerisque sem, vel volutpat dui. Nulla a laoreet arcu, vitae varius erat. Proin varius fringilla dui eget dignissim.
+\section{Working with accelerators}
+% GPU parallelisation (does this fill an extra chapter though, or would it rather be buried in PartitionedOperations)
+% One might write something to MPIX_Stream?
 
-Vivamus non ipsum nunc. Donec sit amet erat vitae enim vulputate ultricies nec id mauris. Phasellus consectetur sem aliquet malesuada egestas. Aliquam viverra libero eros, ac scelerisque elit vestibulum non. Integer viverra lacus quis nibh vulputate pharetra. Vestibulum viverra nulla et facilisis luctus. Sed mollis ultrices nulla. Vivamus ut ornare diam.
+% I'd love to write about actual performance, but I doubt that I can get a working example on Ara in under a week
+% Also I straight up wouldn't know how to benchmark it properly
+
+% End, roughly 0.5 pages
+\section{Conclusions}
+\section{References}
 
 \end{document}

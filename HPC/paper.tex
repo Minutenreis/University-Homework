@@ -47,42 +47,142 @@
 
 \maketitle
 
+% TODO: Was kann man in so nem Paper großartig zitieren außer dem MPI Standard?
+
 % Introduction, roughly 1 page
 \section{Introduction}
 
-Supercomputing relies on multiple layers of parallelisation, one intranode and one internode.
-Historically this was handled fine with a MPI+MPI (or MPI-Everywhere) programming model.
-In modern supercomputing rising core counts neccessitates a more nuanced programming model, one that makes scaling across cores on a node easier.
-This caused MPI+OpenMP to become the new de facto standard programming model in Supercomputing.
-It simplifies the seperation of internode and intranode tasks greatly, but it also imposes new challenges for developers.
-This paper tries to summarize the current (MPI4.0) methods to overcome these challenges and unlock high performance MPI+OpenMP applications.
+% Historisch MPI+MPI
+% heute MPI+OpenMP (warum)
+% Was sind die schwierigkeiten mit MPI+OpenMP
+% Paper versucht Lösungen zusammenzufassen
+Message Passing Interface is the de facto standard for scaling High Performance Computing (HPC) Workloads across nodes.
+Historically applications relied on the memory wasteful model of MPI+MPI (or MPI-Everywhere) to achieve good scalability across nodes.
+In the last decades however a rapid increase in core counts per CPU neccessitated a switch to MPI+OpenMP to better use newer CPU's ressources.
+While this did work, it brought fourth new challenges in designing software for HPC workloads.
+The main pain point is the much harder to achieve parallel communication in MPI+OpenMP compared to MPI+MPI.
+The newest MPI version (4.0) introduced new ways to express communication parallelism in MPI software to ease this pain point.
+So this paper tries to give an overview over the current ways to express parallel communication to build scalable MPI+OpenMP software.
+This includes a brief theoretical look at each method as well as sample code so developers may apply these methods to their own software.
+
 % this feels like making a buzzword list
 
 
 \section{Motivation}
 % write why parallel communications is such a large burdon
+The historically preferred method of MPI+MPI made logical parallelism easy to express in software.
+It did however have massive problems with memory management.
+Running a MPI+MPI program on a node with $n$ cores meant having $n$ copies of the program in memory.
+It also leads to some less than desirable effects in the MPI library as each node has to maintain a full list of all MPI nodes in \verb|MPI_COMM_WORLD|.
+%todo: this arguably isn't a problem as long as you don't run on millions of nodes, so include it or nah? especially with how MPI_Sessions can remove the need entirely
+This means for a program of m nodes with n cores each, that each node has to maintain a list of $n \cdot n \cdot m = n^2 \cdot m$ MPI nodes.
+Running an equivalent MPI+OpenMP program with 1 OpenMP program per node addresses these problems in an elegant way.
+%todo: citation or test needed
+First of all the whole program no longer needs to be copied $n$ times on each core, but nearly the spawned parallel loop sections of OpenMP, which uses significantly less memory.
+Secondly the size of \verb|MPI_COMM_WORLD| reduced to $m$ MPI nodes with each node only having to keep 1 such list.
+For modern processors with over $n=100$ cores on a dual socket system this leads to a reduction of over $40000$ in list size on each processor, enabling far higher scaling before \verb|MPI_COMM_WORLD| size is a problem again.
+
+MPI+OpenMP programs do however typically exhibit parallelisation problems in their communication.
+That is caused by the MPI libraries typically being very conservative with their optimizations.
+The MPI standard also mandates a high amount of serialization, for example all requests on the same \verb|<Communicator,Rank>| pair need to be serialized as per the standard.
+That requirement is important for serial MPI programs (as you'd have in MPI+MPI for example) as it prevents deadlocks where two or more nodes wait on each other.
+In multithreaded OpenMP programs it prohibits trivial parallelisation where each Node just communicates over \verb|MPI_COMM_WORLD|.
+So instead developers have to fall back on more sophisticated techniques, which is the topic of the rest of this paper.
 
 % Body, roughly 2.5 pages
 \section{Parallel Communication in MPI4.0}
 
-% focus on CPU parallelisation
+% should there be a explainer for all versions before or inlined?
+
+In contrast to older versions MPI4.0 introduced new operations (Partitioned Operations, Sessions) explicitely for parallel communication \cite{mpi40}.
+%todo: gab es das relaxing zu tags erst in 4.0 oder schon verher? wenn letzteres, dann folgenden Satz entfernen.
+This together with added hints to relax matching requirements makes MPI4.0 more suited towards fast MPI+OpenMP implementations.
+%todo: subsections?; is it all current ways or are there more in the standard? if yes list them or ignore? write for MPI4.0 or MPI4.1? 4.2?
+In the following subsections this paper will discuss the current ways to parallelise communication between nodes in MPI4.0.
+
 \subsection{Communicator}
-% see Presentation
+
+%todo: is simple the right word? most backwards compatible?
+The simplest though maybe not most intuitive way to parallelise communication is to assign each parallel communication channel its own communicator.
+This works since MPI only imposes serialization on the same \verb|<Communicator,Rank>| pair by default.
+That same statement implies no relative ordering between different Communicators \cite{zambreLessonsLearned2022}, hence its potential for expressing parallelisation.
+To use different Communicator the developer needs to be aware of a few key problems:
+
+1) For optimal parallelisation there needs to be two Communicator for each pair of threads communicating internode.
+%todo: insert figure, also link figure
+To demonstrate the need for two Communicator per pair of threads imagine a problem devided into a line of Nodes.
+If only one Communicator is used per pair of threads, communication between \verb|<Rank_0,Thread_5>| and \verb|<Rank_1,Thread_3>| shares its Communicator with the communication between \verb|<Rank_1,Thread_5>| and \verb|<Rank_2,Thread_3>|.
+This is problematic since the messages from \verb|Rank_0| and \verb|Rank_2| to \verb|Rank_1| now run on the same communicator and with that those two exchanges are serialized.
+
+2) For large multidimensional stencils the number of Communicators needed explodes and you should consider alternative parallelisation methods.
+%todo: mark AMD EPYC Rome as Name?
+For more complex stencils like a 27-point stencil as seen in Hypre\cite{hypre2020} on a larger processor like a 64-core AMD EPYC Rome the number of Communicators needed to express parallelism amounts to 808 despite only needing 56 parallel channels for an optimal mapping \cite{zambreLessonsLearned2022}.
+This not only makes it harder to develop the optimal Communicator mapping, it also strains the MPI library that has to map the multitude of Communicators to a far smaller number of hardware contexts (for example 160 in Omni-Path \cite{intelOmniPath}).
+Since the library lacks the knowledge of the intended communication pattern its mapping to the relevant hardware contexts will be suboptimal.
+
+3) Using Communicators for anything but parallelism introduces either performance loss or limits the portability of the program.
+Since MPI4.0 lacks standardised hints regarding Communicator usage, MPI libraries need to assume every Communicator is used for expressing parallelism if it parallelises Communicators at all .
+In such a case, if any Communicator is not used for parallelisation, it puts additional strain on the library for no benefit reducing overall performance.
+%todo: find example hint in MPICH or OpenMP
+A software may be written with library specific hints regarding this usage, but doing so binds one to that library to achieve the desired performance \cite{zambreLessonsLearned2022}.
+
+4) Using Communicators for irregular access patterns degrades performance.
+Imagine a taskbased application with $n$ worker threads and $1$ master thread on each node.
+%todo: generate new graphic like "Lessons Learned on MPI+Threads" Fig. 5 but with N nodes to better demonstrate the infeasability of "Duplicating Communicators per communication partner"
+All workers on one node may need to communicate with the master thread of any other node.
+In such a case the software may either generate $n$ Communicator for each worker thread on a node or generate $n \cdot m$ Communicator for all $n$ worker on a node and all $m$ nodes.
+The latter version is infeasable for any non trivial number of nodes as it strains the MPI library for the same reason large multidimensional stencils do.
+So the software is realistically restricted to just $n$ Communicators.
+This then forces the master thread to communicate over teh same Communicators as its workers.
+And as the master thread needs to iterate over all possible Communicators it will contend with its workers to access the Communicators and slow down the application that way.
+This leads to Communicators performing worse than other parallelisation alternatives.
+As example it performed 1.63x worse than Tags with hints in the task-based framework Legion \cite{zambreLogicalParallel2021}.
+
 \subsection{Tags}
 % see Presentation
 \subsection{Partitioned Operations}
 % see Presentation
 \subsection{Sessions} %no MPI Endpoints, since they didn't make the cut for MPI4.0 and are thus not relevant to current parallelisation
 
-\section{Working with accelerators}
-% GPU parallelisation (does this fill an extra chapter though, or would it rather be buried in PartitionedOperations)
-% One might write something to MPIX_Stream?
+\section{Lorem Ipsum}
 
-% I'd love to write about actual performance, but I doubt that I can get a working example on Ara in under a week
-% Also I straight up wouldn't know how to benchmark it properly
+Anmerkung Justus: Der folgende Lorem Ipsum Text ist nur eingefügt damit ich ein Gefühl fürs Layout kriege, er ist natürlich nicht Teil des finalen Papers.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et magna ac felis condimentum molestie sed eu nunc. Nulla dignissim erat a enim faucibus scelerisque. Maecenas sed nisl a orci aliquam tempus sit amet et ligula. Quisque vel rhoncus odio. Aenean euismod, quam a suscipit placerat, nisl eros viverra arcu, et vehicula arcu arcu ac nibh. Proin in erat ac est semper mollis in in neque. Sed vitae tellus tincidunt, sodales risus non, aliquam nunc. Fusce at faucibus arcu. Fusce vulputate mauris eros, at tempor magna pharetra eu. Vivamus ut lorem vitae ipsum porta egestas. Fusce pretium erat at risus suscipit ultricies. Ut mollis, nunc nec tincidunt condimentum, nulla eros pretium magna, ut pulvinar augue turpis sit amet ipsum. Sed a eros at eros tristique dictum. Pellentesque suscipit libero pulvinar, finibus arcu et, gravida arcu.
+
+Nunc ac dui ullamcorper, consequat velit at, porta eros. Ut ac dignissim nulla. Phasellus tincidunt consectetur iaculis. Aliquam dignissim mauris eu augue faucibus, quis mollis nulla scelerisque. Morbi enim diam, tempor et elit sit amet, mollis lacinia orci. Phasellus ornare, sapien at dapibus vehicula, turpis libero bibendum sem, vitae lobortis sem elit et erat. Vivamus pharetra nunc id nunc molestie dignissim. Sed tempor bibendum ipsum, ac volutpat ligula vestibulum non. Sed luctus luctus diam vel faucibus. Vestibulum in facilisis justo, vitae aliquam nunc. Nunc lacinia vehicula arcu. Curabitur luctus ex vel quam ultrices gravida. Mauris elementum sem sit amet nisi hendrerit consectetur id et elit. Donec aliquam eros vitae ligula malesuada egestas.
+
+Maecenas elit tellus, hendrerit sit amet lectus at, suscipit posuere lacus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Quisque vitae vestibulum erat. Phasellus aliquet ligula nec molestie sagittis. Nam et neque vehicula, accumsan sem vitae, efficitur nulla. Maecenas sit amet erat sapien. In scelerisque ligula sit amet ante gravida rhoncus. Etiam non tempor libero. Praesent efficitur imperdiet rutrum. Aliquam non dapibus est. Suspendisse potenti. Sed ac malesuada nisl. Mauris semper id ex sit amet mollis. Nulla massa justo, volutpat id orci et, auctor dictum magna. Suspendisse tincidunt ultrices tortor, vitae mattis ligula tempor non. Suspendisse sollicitudin suscipit mi, vel pulvinar est semper in.
+
+Quisque eleifend vehicula lorem eget placerat. Nullam malesuada odio non porttitor porttitor. Aliquam gravida molestie ligula, at bibendum ipsum sollicitudin sit amet. Duis efficitur posuere massa, sit amet ultricies urna elementum eget. Donec id mauris vitae sem consectetur finibus et at justo. Donec consectetur nisi non nunc viverra, mattis ultricies eros ultricies. Phasellus quis blandit tellus. Sed sodales consequat erat nec rutrum. Suspendisse efficitur nibh neque. Praesent eget placerat lectus. Nam pretium neque vel lectus aliquam egestas. Nulla at placerat quam, vitae tempor metus. Etiam rutrum lacus in metus congue, ut tincidunt sapien porttitor. Cras id orci ut leo ornare commodo at dapibus metus.
+
+Vivamus bibendum, odio id egestas fermentum, diam libero porta lectus, et finibus turpis tortor quis magna. Mauris lorem neque, porta ut dui vel, pellentesque pulvinar nisl. Ut nulla nisl, hendrerit sed rutrum ac, sodales in dui. Integer scelerisque felis arcu, a iaculis massa varius ut. Donec venenatis fringilla magna, sed convallis sem sollicitudin id. Fusce mi elit, ultricies nec laoreet eget, condimentum id nibh. Maecenas aliquam elit quis lectus consectetur hendrerit. Duis ut viverra sem, ac lobortis ex. Curabitur viverra volutpat quam finibus ornare.
+
+Pellentesque aliquet tellus non erat fermentum, commodo vestibulum dolor pulvinar. Etiam scelerisque tortor at tincidunt vulputate. Etiam lobortis nisl erat, ac imperdiet magna semper sit amet. Sed at dictum ex. Aliquam dictum, nisl elementum rutrum feugiat, nisl sapien rutrum augue, quis lacinia nisi massa a mauris. Curabitur fermentum molestie leo vitae faucibus. Phasellus sed ligula nibh. Nam non pharetra nibh, a interdum ipsum. Praesent consequat massa placerat, ornare erat eget, rutrum felis. Praesent vel ex sagittis, euismod sem ut, feugiat augue.
+
+Nam ac sapien id justo vulputate tempus eget nec sapien. Pellentesque nec enim dignissim, dapibus elit vel, aliquam lectus. Etiam ultrices elementum magna at lacinia. Phasellus ac lacus a massa ullamcorper imperdiet eget non turpis. Aliquam euismod tellus in turpis porttitor sollicitudin. Phasellus consectetur, arcu a luctus sodales, tellus ex aliquet odio, in pharetra felis augue et lectus. Nam tristique nec elit vitae tristique. Nunc orci purus, venenatis lobortis pellentesque auctor, pellentesque vitae tortor. Sed metus elit, accumsan at auctor non, convallis vel tortor. Ut sagittis iaculis dapibus. Fusce est ligula, maximus sed sagittis eu, lobortis at nisl. Vestibulum sollicitudin, odio ac cursus fermentum, ante nulla dignissim nisl, ac porttitor felis nisi eget nisl. Aenean id purus eu turpis lobortis feugiat. In ipsum erat, varius sed orci at, egestas rhoncus nisi. Pellentesque vulputate porta urna et tristique. In vel dui a nisi rhoncus varius ac vel metus.
+
+Cras tincidunt justo urna. Nulla purus erat, elementum a nisi et, sollicitudin vestibulum dui. Mauris tristique, augue sed viverra dignissim, velit ligula euismod lectus, sed sollicitudin velit nunc non mi. Sed sodales tellus in arcu mollis, eget porttitor turpis pulvinar. Nunc efficitur aliquam purus, vel venenatis nisl maximus vitae. Donec cursus arcu dolor, et accumsan libero auctor ac. Vestibulum viverra massa ac magna vestibulum, sed fringilla ipsum pulvinar. Aenean id libero posuere, ultrices elit vel, sagittis risus.
+
+Quisque lorem mauris, semper in nibh sed, imperdiet rutrum justo. Sed risus odio, egestas et dolor quis, euismod tempus neque. Morbi mattis fermentum nunc, id commodo risus pharetra at. Etiam accumsan sapien lorem, eu feugiat arcu blandit at. Ut tincidunt id odio ac interdum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Mauris euismod sem magna, a pretium risus venenatis non. Nunc accumsan orci eu justo tristique tincidunt. Suspendisse nibh justo, condimentum eget cursus sed, blandit venenatis quam. Phasellus eros nulla, rhoncus eu hendrerit eu, vestibulum in ligula. Vestibulum nec mollis neque. Aliquam vel mauris et nulla pulvinar sodales. Sed tempor sapien turpis, vitae viverra ligula viverra vitae. Etiam efficitur congue lectus, ac semper velit semper a.
+
+In viverra mollis aliquet. Suspendisse finibus justo quis orci lacinia, sed pharetra sem congue. Mauris at erat lectus. Duis ipsum massa, vulputate non felis rutrum, aliquet aliquet augue. Donec molestie mi a ipsum accumsan faucibus. Etiam lacinia nunc sed varius congue. Phasellus et sollicitudin diam, sit amet vulputate leo. Pellentesque non lorem sodales nisi luctus sollicitudin.
+
+Cras posuere nunc at nulla auctor fermentum. Quisque ullamcorper dolor neque, ac rutrum magna dapibus et. Morbi ut nisl nec leo hendrerit malesuada. Vivamus orci nisl, molestie ac sem ac, elementum viverra augue. Cras quis venenatis lacus. Vestibulum quis rhoncus urna. Suspendisse libero neque, euismod vel molestie eget, lacinia ac enim. Nulla ultrices tempus bibendum. Donec eu felis mauris. Sed eget ligula et purus lacinia fringilla eget quis ligula.
+
+Morbi venenatis consectetur erat, finibus finibus leo. Proin eleifend nec magna quis iaculis. Vestibulum sit amet odio gravida, ornare ante aliquet, mattis dui. Ut lobortis mauris sed semper aliquet. Suspendisse fermentum pretium ex eu pellentesque. Aenean ac auctor enim, quis egestas nisi. Duis at tincidunt felis. Mauris et dolor sit amet lectus auctor sollicitudin vel ultricies nibh. Morbi interdum nunc quam, in pellentesque nunc aliquam quis. Cras blandit orci ac purus posuere mollis. Duis scelerisque blandit mi sed blandit. Phasellus mollis interdum ante, vitae congue leo dignissim eget. Nam ac orci eget elit rutrum sodales id sit amet mi.
+
+Nulla scelerisque condimentum commodo. Vivamus scelerisque faucibus metus non viverra. Curabitur eget mauris feugiat, tempor tortor sit amet, blandit leo. Duis nec enim sagittis, tempor tortor auctor, vestibulum arcu. Nunc pretium, sem sed vestibulum tristique, orci tellus mattis nulla, in dictum sem tellus in orci. Morbi at massa diam. Vivamus vehicula, ligula ac tristique eleifend, elit enim porta urna, ac efficitur massa turpis a purus. Sed tempus massa ac orci mattis, sit amet convallis turpis porttitor. Maecenas scelerisque velit vel orci feugiat, ac viverra erat dictum. Nullam quis lectus in dolor eleifend ultricies vel eu magna.
+
+Donec varius aliquam cursus. Maecenas mattis nisl sit amet nibh sollicitudin finibus. Pellentesque porta sed orci nec elementum. Nam ac urna ultricies felis hendrerit finibus. Duis velit mi, ullamcorper a pellentesque sit amet, interdum nec velit. Vivamus eu libero erat. Aliquam erat volutpat. Nam dignissim enim nibh, vel mattis nibh tempus vitae. Aliquam congue nulla eget sapien commodo, id auctor dolor tristique. Aenean vel sem fringilla dui hendrerit pharetra sed vel elit.
+
+
+
+%vll. Wort zur Umsetzung in Bibliotheken? OpenMPI und MPICH haben es beide immerhin ...
 
 % End, roughly 0.5 pages
 \section{Conclusions}
-\section{References}
+\bibliographystyle{plain} % We choose the "plain" reference style
+\bibliography{citations} % Entries are in the refs.bib file
 
 \end{document}

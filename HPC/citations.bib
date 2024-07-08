@@ -1,0 +1,60 @@
+@manual{mpi40,
+  author = {{Message Passing Interface Forum}},
+  title  = {{MPI}: A Message-Passing Interface Standard Version 4.0},
+  url    = {https://www.mpi-forum.org/docs/mpi-4.0/mpi40-report.pdf},
+  year   = 2021,
+  month  = jun
+}
+
+@article{zambreLogicalParallel2021,
+  author   = {Zambre, Rohit and Sahasrabudhe, Damodar and Zhou, Hui and Berzins, Martin and Chandramowlishwaran, Aparna and Balaji, Pavan},
+  journal  = {IEEE Transactions on Parallel and Distributed Systems},
+  title    = {Logically Parallel Communication for Fast MPI+Threads Applications},
+  year     = {2021},
+  volume   = {32},
+  number   = {12},
+  pages    = {3038-3052},
+  keywords = {Parallel processing;Supercomputing;Programming;Semantics;Upper bound;MPI+threads;MPI+OpenMP;exascale MPI;MPI_THREAD_MULTIPLE;MPI endpoints;Uintah;HYPRE;wombat;Legion},
+  doi      = {10.1109/TPDS.2021.3075157}
+}
+
+@misc{zambreLessonsLearned2022,
+  title         = {Lessons Learned on MPI+Threads Communication},
+  author        = {Rohit Zambre and Aparna Chandramowlishwaran},
+  year          = {2022},
+  eprint        = {2206.14285},
+  archiveprefix = {arXiv},
+  primaryclass  = {cs.DC},
+  url           = {https://arxiv.org/abs/2206.14285}
+}
+
+@inproceedings{hypre2020,
+  author    = {Sahasrabudhe, Damodar
+               and Berzins, Martin},
+  editor    = {Krzhizhanovskaya, Valeria V.
+               and Z{\'a}vodszky, G{\'a}bor
+               and Lees, Michael H.
+               and Dongarra, Jack J.
+               and Sloot, Peter M. A.
+               and Brissos, S{\'e}rgio
+               and Teixeira, Jo{\~a}o},
+  title     = {Improving Performance of the Hypre Iterative Solver for Uintah Combustion Codes on Manycore Architectures Using MPI Endpoints and Kernel Consolidation},
+  booktitle = {Computational Science -- ICCS 2020},
+  year      = {2020},
+  publisher = {Springer International Publishing},
+  address   = {Cham},
+  pages     = {175--190},
+  abstract  = {The solution of large-scale combustion problems with codes such as the Arches component of Uintah on next generation computer architectures requires the use of a many and multi-core threaded approach and/or GPUs to achieve performance. Such codes often use a low-Mach number approximation, that require the iterative solution of a large system of linear equations at every time step. While the discretization routines in such a code can be improved by the use of, say, OpenMP or Cuda Approaches, it is important that the linear solver be able to perform well too. For Uintah the Hypre iterative solver has proved to solve such systems in a scalable way. The use of Hypre with OpenMP leads to at least 2x slowdowns due to OpenMP overheads, however. This behavior is analyzed and a solution proposed by using the MPI Endpoints approach is implemented within Hypre, where each team of threads acts as a different MPI rank. This approach minimized OpenMP synchronization overhead, avoided slowdowns, performed as fast or (up to 1.5x) faster than Hypre's MPI only version, and allowed the rest of Uintah to be optimized using OpenMP. Profiling of the GPU version of Hypre showed the bottleneck to be the launch overhead of thousands of micro-kernels. The GPU performance was improved by fusing these micro kernels and was further optimized by using Cuda-aware MPI. The overall speedup of 1.26x to 1.44x was observed compared to the baseline GPU implementation.},
+  isbn      = {978-3-030-50371-0}
+}
+
+@manual{intelOmniPath,
+  author       = {},
+  title        = {Intel® Omni-Path Fabric Host Software User Guide},
+  organization = {Intel Corporation},
+  edition      = {16.0},
+  year         = {2020},
+  month        = {Jan},
+  note         = {page 61},
+  url          = {https://www.intel.com/content/dam/support/us/en/documents/network-and-i-o/fabric-products/Intel_OP_Fabric_Host_Software_UG_H76470_v16_0.pdf}
+}

@@ -110,6 +110,7 @@ To use different Communicator the developer needs to be aware of a few key probl
 
 1) For optimal parallelisation there needs to be two Communicator for each pair of threads communicating internode.
 %todo: insert figure, also link figure
+%todo: possibly code for that same figure so the complexity can be better judged by a reader?
 To demonstrate the need for two Communicator per pair of threads imagine a problem devided into a line of Nodes.
 If only one Communicator is used per pair of threads, communication between \verb|<Rank_0,Thread_5>| and \verb|<Rank_1,Thread_3>| shares its Communicator with the communication between \verb|<Rank_1,Thread_5>| and \verb|<Rank_2,Thread_3>|.
 This is problematic since the messages from \verb|Rank_0| and \verb|Rank_2| to \verb|Rank_1| now run on the same communicator and with that those two exchanges are serialized.

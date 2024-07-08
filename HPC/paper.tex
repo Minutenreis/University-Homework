@@ -1,4 +1,4 @@
-\documentclass[sigconf]{acmart} %\documentclass[sigconf, language=german]{acmart}
+\documentclass[sigconf]{acmart}
 \usepackage{booktabs}
 
 \begin{document}
@@ -46,8 +46,6 @@
 \end{abstract}
 
 \maketitle
-
-% TODO: Was kann man in so nem Paper großartig zitieren außer dem MPI Standard?
 
 % Introduction, roughly 1 page
 \section{Introduction}
@@ -97,7 +95,7 @@ So instead developers have to fall back on more sophisticated techniques, which 
 In contrast to older versions MPI4.0 introduced new operations (Partitioned Operations, Sessions) explicitely for parallel communication \cite{mpi40}.
 %todo: gab es das relaxing zu tags erst in 4.0 oder schon verher? wenn letzteres, dann folgenden Satz entfernen.
 This together with added hints to relax matching requirements makes MPI4.0 more suited towards fast MPI+OpenMP implementations.
-%todo: subsections?; is it all current ways or are there more in the standard? if yes list them or ignore? write for MPI4.0 or MPI4.1? 4.2?
+%todo: do I present all current ways or are there more in the standard? if yes list them or ignore? write for MPI4.0 or MPI4.1? 4.2?
 In the following subsections this paper will discuss the current ways to parallelise communication between nodes in MPI4.0.
 
 \subsection{Communicator}
@@ -183,7 +181,7 @@ Donec varius aliquam cursus. Maecenas mattis nisl sit amet nibh sollicitudin fin
 
 % End, roughly 0.5 pages
 \section{Conclusions}
-\bibliographystyle{plain} % We choose the "plain" reference style
-\bibliography{citations} % Entries are in the refs.bib file
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{citations}
 
 \end{document}

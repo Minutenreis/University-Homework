@@ -19,6 +19,7 @@ noten = [
     (1.3,6), # Numerische Mathematik
     # C
     (1.3,6), # IT-Sicherheit 
+    (2.7,6), # Algorithmisches Beweisen
     (1.3,3), # Projektmanagement (ASQ) 
     # A
     (1.0,9), # Grundlagen informatischer Problemlösung 

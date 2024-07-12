@@ -3,7 +3,8 @@
 
 \begin{document}
 
-\title{MPI+OpenMP in MPI4.0}
+%todo: look into title
+\title{Parallelising Hybrid MPI Programms efficiently}
 \author{Dreßler Justus}
 \orcid{0009-0005-0657-5854}
 \affiliation{
@@ -48,17 +49,18 @@
 \maketitle
 
 % Introduction, roughly 1 page
+% todo: rework
 \section{Introduction}
 
-% Historisch MPI+MPI
+% Historisch MPI-Everywhere
 % heute MPI+OpenMP (warum)
 % Was sind die schwierigkeiten mit MPI+OpenMP
 % Paper versucht Lösungen zusammenzufassen
 Message Passing Interface is the de facto standard for scaling High Performance Computing (HPC) Workloads across nodes.
-Historically applications relied on the memory wasteful model of MPI+MPI (or MPI-Everywhere) to achieve good scalability across nodes.
+Historically applications relied on the memory wasteful model of MPI-Everywhere to achieve good scalability across nodes.
 In the last decades however a rapid increase in core counts per CPU neccessitated a switch to MPI+OpenMP to better use newer CPU's ressources.
 While this did work, it brought fourth new challenges in designing software for HPC workloads.
-The main pain point is the much harder to achieve parallel communication in MPI+OpenMP compared to MPI+MPI.
+The main pain point is the much harder to achieve parallel communication in MPI+OpenMP compared to MPI-Everywhere.
 The newest MPI version (4.0) introduced new ways to express communication parallelism in MPI software to ease this pain point.
 So this paper tries to give an overview over the current ways to express parallel communication to build scalable MPI+OpenMP software.
 This includes a brief theoretical look at each method as well as sample code so developers may apply these methods to their own software.
@@ -67,36 +69,39 @@ This includes a brief theoretical look at each method as well as sample code so 
 
 
 \section{Motivation}
-% write why parallel communications is such a large burdon
-The historically preferred method of MPI+MPI made logical parallelism easy to express in software.
+The historically preferred method of MPI-Everywhere made logical parallelism easy to express in software.
+%todo: cite or rework
 It did however have massive problems with memory management.
-Running a MPI+MPI program on a node with $n$ cores meant having $n$ copies of the program in memory.
-It also leads to some less than desirable effects in the MPI library as each node has to maintain a full list of all MPI nodes in \verb|MPI_COMM_WORLD|.
-%todo: this arguably isn't a problem as long as you don't run on millions of nodes, so include it or nah? especially with how MPI_Sessions can remove the need entirely
-This means for a program of m nodes with n cores each, that each node has to maintain a list of $n \cdot n \cdot m = n^2 \cdot m$ MPI nodes.
-Running an equivalent MPI+OpenMP program with 1 OpenMP program per node addresses these problems in an elegant way.
-%todo: citation or test needed
-First of all the whole program no longer needs to be copied $n$ times on each core, but nearly the spawned parallel loop sections of OpenMP, which uses significantly less memory.
-Secondly the size of \verb|MPI_COMM_WORLD| reduced to $m$ MPI nodes with each node only having to keep 1 such list.
-For modern processors with over $n=100$ cores on a dual socket system this leads to a reduction of over $40000$ in list size on each processor, enabling far higher scaling before \verb|MPI_COMM_WORLD| size is a problem again.
+Classical MPI-Everywhere programs spawn a single process per core available.
+MPI+OpenMP programs normally spawn a single process per node or NUMA domain \cite{zambreLessonsLearned2022}.
 
-MPI+OpenMP programs do however typically exhibit parallelisation problems in their communication.
-That is caused by the MPI libraries typically being very conservative with their optimizations.
-The MPI standard also mandates a high amount of serialization, for example all requests on the same \verb|<Communicator,Rank>| pair need to be serialized as per the standard.
-That requirement is important for serial MPI programs (as you'd have in MPI+MPI for example) as it prevents deadlocks where two or more nodes wait on each other.
-In multithreaded OpenMP programs it prohibits trivial parallelisation where each Node just communicates over \verb|MPI_COMM_WORLD|.
-So instead developers have to fall back on more sophisticated techniques, which is the topic of the rest of this paper.
+%todo: cite MPI 3 Standard
+A MPI communicator is a construct that defines which processes may talk with each other.
+Each MPI process is required to keep a list of all participating MPI processes in the default communicator \verb|MPI_COMM_WORLD|.
+Assuming an $n$ core processor $n$ copies of the list are lying in each nodes memory in the MPI-Everywhere model.
+An equivalent MPI+OpenMP program shares its list between its cores and also spawns $n$ times less processes, so \verb|MPI_COMM_WORLD| is $n$ times smaller and $n$ times less often on each processor.
+For current generation processors exceeding 100 cores like Intel® Xeon® 6 \cite{intelXeon6} or 4th Generation AMD EPYC™ \cite{amd4thGenEpyc} this equates to a reduction of \verb|MPI_COMM_WORLD|'s memory consumption of over $n^2 > 10.000$ times.
+
+Each MPI process also needs to be a full program, which means each core has to have all instructions duplicated.
+OpenMP however only needs to generate code for the actually parallised parts (typically loops) of the program, which reduces the size for all additional cores significantly.
+
+MPI+OpenMP programs do, however, tend to perform slower than MPI-Everywhere versions in practice \cite{zambreLessonsLearned2022}.
+This is caused in part by accidental synchronization while calling the MPI library.
+%todo: cite standard
+The MPI standard mandates a high amount of serialization to ensure correct communication, for example all messages on the same \verb|<Communicator,Rank>| pair are defined as non-overtaking in MPI 4.0 Section 3.5\cite{mpi40}.
+This is important to prevent deadlocks (two processes each wait on the other) but also slows down the communication overall.
+We will explore how to circumvent such slowdowns in the following section.
+
 
 % Body, roughly 2.5 pages
-\section{Parallel Communication in MPI4.0}
+\section{Parallel Communication in MPI 4.0}
 
 % should there be a explainer for all versions before or inlined?
 
-In contrast to older versions MPI4.0 introduced new operations (Partitioned Operations, Sessions) explicitely for parallel communication \cite{mpi40}.
+In contrast to older versions MPI 4.0 introduced new operations (Partitioned Operations, Sessions) explicitely for parallel communication \cite{mpi40}.
 %todo: gab es das relaxing zu tags erst in 4.0 oder schon verher? wenn letzteres, dann folgenden Satz entfernen.
-This together with added hints to relax matching requirements makes MPI4.0 more suited towards fast MPI+OpenMP implementations.
-%todo: do I present all current ways or are there more in the standard? if yes list them or ignore? write for MPI4.0 or MPI4.1? 4.2?
-In the following subsections this paper will discuss the current ways to parallelise communication between nodes in MPI4.0.
+This together with added hints to relax matching requirements makes MPI 4.0 more suited towards fast MPI+OpenMP implementations.
+In the following subsections this paper will discuss the current ways to parallelise communication between nodes in MPI 4.0.
 
 \subsection{Communicator}
 
@@ -120,7 +125,7 @@ This not only makes it harder to develop the optimal Communicator mapping, it al
 Since the library lacks the knowledge of the intended communication pattern its mapping to the relevant hardware contexts will be suboptimal.
 
 3) Using Communicators for anything but parallelism introduces either performance loss or limits the portability of the program.
-Since MPI4.0 lacks standardised hints regarding Communicator usage, MPI libraries need to assume every Communicator is used for expressing parallelism if it parallelises Communicators at all .
+Since MPI 4.0 lacks standardised hints regarding Communicator usage, MPI libraries need to assume every Communicator is used for expressing parallelism if it parallelises Communicators at all .
 In such a case, if any Communicator is not used for parallelisation, it puts additional strain on the library for no benefit reducing overall performance.
 %todo: find example hint in MPICH or OpenMP
 A software may be written with library specific hints regarding this usage, but doing so binds one to that library to achieve the desired performance \cite{zambreLessonsLearned2022}.
@@ -141,7 +146,7 @@ As example it performed 1.63x worse than Tags with hints in the task-based frame
 % see Presentation
 \subsection{Partitioned Operations}
 % see Presentation
-\subsection{Sessions} %no MPI Endpoints, since they didn't make the cut for MPI4.0 and are thus not relevant to current parallelisation
+\subsection{Sessions}
 
 \section{Lorem Ipsum}
 
@@ -168,12 +173,6 @@ Quisque lorem mauris, semper in nibh sed, imperdiet rutrum justo. Sed risus odio
 In viverra mollis aliquet. Suspendisse finibus justo quis orci lacinia, sed pharetra sem congue. Mauris at erat lectus. Duis ipsum massa, vulputate non felis rutrum, aliquet aliquet augue. Donec molestie mi a ipsum accumsan faucibus. Etiam lacinia nunc sed varius congue. Phasellus et sollicitudin diam, sit amet vulputate leo. Pellentesque non lorem sodales nisi luctus sollicitudin.
 
 Cras posuere nunc at nulla auctor fermentum. Quisque ullamcorper dolor neque, ac rutrum magna dapibus et. Morbi ut nisl nec leo hendrerit malesuada. Vivamus orci nisl, molestie ac sem ac, elementum viverra augue. Cras quis venenatis lacus. Vestibulum quis rhoncus urna. Suspendisse libero neque, euismod vel molestie eget, lacinia ac enim. Nulla ultrices tempus bibendum. Donec eu felis mauris. Sed eget ligula et purus lacinia fringilla eget quis ligula.
-
-Morbi venenatis consectetur erat, finibus finibus leo. Proin eleifend nec magna quis iaculis. Vestibulum sit amet odio gravida, ornare ante aliquet, mattis dui. Ut lobortis mauris sed semper aliquet. Suspendisse fermentum pretium ex eu pellentesque. Aenean ac auctor enim, quis egestas nisi. Duis at tincidunt felis. Mauris et dolor sit amet lectus auctor sollicitudin vel ultricies nibh. Morbi interdum nunc quam, in pellentesque nunc aliquam quis. Cras blandit orci ac purus posuere mollis. Duis scelerisque blandit mi sed blandit. Phasellus mollis interdum ante, vitae congue leo dignissim eget. Nam ac orci eget elit rutrum sodales id sit amet mi.
-
-Nulla scelerisque condimentum commodo. Vivamus scelerisque faucibus metus non viverra. Curabitur eget mauris feugiat, tempor tortor sit amet, blandit leo. Duis nec enim sagittis, tempor tortor auctor, vestibulum arcu. Nunc pretium, sem sed vestibulum tristique, orci tellus mattis nulla, in dictum sem tellus in orci. Morbi at massa diam. Vivamus vehicula, ligula ac tristique eleifend, elit enim porta urna, ac efficitur massa turpis a purus. Sed tempus massa ac orci mattis, sit amet convallis turpis porttitor. Maecenas scelerisque velit vel orci feugiat, ac viverra erat dictum. Nullam quis lectus in dolor eleifend ultricies vel eu magna.
-
-Donec varius aliquam cursus. Maecenas mattis nisl sit amet nibh sollicitudin finibus. Pellentesque porta sed orci nec elementum. Nam ac urna ultricies felis hendrerit finibus. Duis velit mi, ullamcorper a pellentesque sit amet, interdum nec velit. Vivamus eu libero erat. Aliquam erat volutpat. Nam dignissim enim nibh, vel mattis nibh tempus vitae. Aliquam congue nulla eget sapien commodo, id auctor dolor tristique. Aenean vel sem fringilla dui hendrerit pharetra sed vel elit.
 
 
 

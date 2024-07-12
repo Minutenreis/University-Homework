@@ -61,11 +61,13 @@ Historically applications relied on the memory wasteful model of MPI-Everywhere 
 In the last decades however a rapid increase in core counts per CPU neccessitated a switch to MPI+OpenMP to better use newer CPU's ressources.
 While this did work, it brought fourth new challenges in designing software for HPC workloads.
 The main pain point is the much harder to achieve parallel communication in MPI+OpenMP compared to MPI-Everywhere.
-The newest MPI version (4.0) introduced new ways to express communication parallelism in MPI software to ease this pain point.
-So this paper tries to give an overview over the current ways to express parallel communication to build scalable MPI+OpenMP software.
+The newest MPI version (4.0) introduced new ways to expose communication parallelism in MPI software to ease this pain point.
+So this paper tries to give an overview over the current ways to expose parallel communication to build scalable MPI+OpenMP software.
 This includes a brief theoretical look at each method as well as sample code so developers may apply these methods to their own software.
 
 % this feels like making a buzzword list
+
+% Problemstellung: Wie expose ich logisch Parallele Nachrichten an eine MPI Biblithek (MPICH, OpenMPI) sodass diese es auf parallele Kommunikationswege mappen kann?
 
 
 \section{Motivation}
@@ -87,8 +89,7 @@ OpenMP however only needs to generate code for the actually parallised parts (ty
 
 MPI+OpenMP programs do, however, tend to perform slower than MPI-Everywhere versions in practice \cite{zambreLessonsLearned2022}.
 This is caused in part by accidental synchronization while calling the MPI library.
-%todo: cite standard
-The MPI standard mandates a high amount of serialization to ensure correct communication, for example all messages on the same \verb|<Communicator,Rank>| pair are defined as non-overtaking in MPI 4.0 Section 3.5\cite{mpi40}.
+The MPI standard mandates a high amount of serialization to ensure correct communication, for example all messages on the same \verb|<Communicator,Rank>| pair are transmitted in non-overtaking order \cite{mpi40}.
 This is important to prevent deadlocks (two processes each wait on the other) but also slows down the communication overall.
 We will explore how to circumvent such slowdowns in the following section.
 
@@ -96,85 +97,60 @@ We will explore how to circumvent such slowdowns in the following section.
 % Body, roughly 2.5 pages
 \section{Parallel Communication in MPI 4.0}
 
-% should there be a explainer for all versions before or inlined?
-
-In contrast to older versions MPI 4.0 introduced new operations (Partitioned Operations, Sessions) explicitely for parallel communication \cite{mpi40}.
-%todo: gab es das relaxing zu tags erst in 4.0 oder schon verher? wenn letzteres, dann folgenden Satz entfernen.
-This together with added hints to relax matching requirements makes MPI 4.0 more suited towards fast MPI+OpenMP implementations.
-In the following subsections this paper will discuss the current ways to parallelise communication between nodes in MPI 4.0.
+There are several ways to implement logical parallel communication efficiently in MPI.
+For MPI versions lower than 4.0 unique communicators may be used per logical parallel communication channel.
+MPI 4.0 introduced Partitioned Operations to aid efficient parallel communication.
+In Partitioned Operations multiple threads each contribute part of a larger message.
+% todo: check that MPI_ANY_TAG is first documented in MPI 4.0 and not already earlier
+MPI 4.0 also added new hints, a way for a program to guarantee MPI that it will not use certain features, that can make tags viable for performant parallel communication.
+% todo: MPI Sessions yes or no? -> Read up if time, don't forget graphics and code before though
+Furthermore MPI 4.0 introduced MPI Sessions, which may be used for parallelisation purposes, but are not considered in the scope of this paper.
+In the following subsections this paper will discuss the mentioned methods in more detail.
 
 \subsection{Communicator}
 
 %todo: is simple the right word? most backwards compatible?
-The simplest though maybe not most intuitive way to parallelise communication is to assign each parallel communication channel its own communicator.
-This works since MPI only imposes serialization on the same \verb|<Communicator,Rank>| pair by default.
-That same statement implies no relative ordering between different Communicators \cite{zambreLessonsLearned2022}, hence its potential for expressing parallelisation.
-To use different Communicator the developer needs to be aware of a few key problems:
+The simplest though maybe not most intuitive way to parallelise communication is to assign each logical parallel message its own communicator.
+Since MPI gives no implies no relative ordering on different communicators \cite{zambreLessonsLearned2022}, libraries can map messages on different communicators to different underlying message channels.
+To use different communicator an MPI application developer needs to be aware of a few key problems:
 
-1) For optimal parallelisation there needs to be two Communicator for each pair of threads communicating internode.
+1) For optimal parallelisation there needs to be two communicator for each pair of threads communicating between different processes.
 %todo: insert figure, also link figure
 %todo: possibly code for that same figure so the complexity can be better judged by a reader?
-To demonstrate the need for two Communicator per pair of threads imagine a problem devided into a line of Nodes.
-If only one Communicator is used per pair of threads, communication between \verb|<Rank_0,Thread_5>| and \verb|<Rank_1,Thread_3>| shares its Communicator with the communication between \verb|<Rank_1,Thread_5>| and \verb|<Rank_2,Thread_3>|.
-This is problematic since the messages from \verb|Rank_0| and \verb|Rank_2| to \verb|Rank_1| now run on the same communicator and with that those two exchanges are serialized.
+To demonstrate the need for two communicator per pair of threads imagine a problem devided into a line of Nodes.
+If only one communicator is used per pair of threads, communication between \verb|<Rank_0,Thread_5>| and \verb|<Rank_1,Thread_3>| shares its communicator with the communication between \verb|<Rank_1,Thread_5>| and \verb|<Rank_2,Thread_3>|.
+This is problematic since the messages from \verb|Rank_0| and \verb|Rank_2| to \verb|Rank_1| now run on the same communicator and with that those two exchanges are no longer independent.
 
-2) For large multidimensional stencils the number of Communicators needed explodes and you should consider alternative parallelisation methods.
-%todo: mark AMD EPYC Rome as Name?
-For more complex stencils like a 27-point stencil as seen in Hypre\cite{hypre2020} on a larger processor like a 64-core AMD EPYC Rome the number of Communicators needed to express parallelism amounts to 808 despite only needing 56 parallel channels for an optimal mapping \cite{zambreLessonsLearned2022}.
-This not only makes it harder to develop the optimal Communicator mapping, it also strains the MPI library that has to map the multitude of Communicators to a far smaller number of hardware contexts (for example 160 in Omni-Path \cite{intelOmniPath}).
-Since the library lacks the knowledge of the intended communication pattern its mapping to the relevant hardware contexts will be suboptimal.
+2) For large multidimensional stencils the number of communicators needed grows rapidly and an MPI program using those should consider other methods to expose parallelisation.
+For more complex stencils like a 27-point 3D stencil as seen in Hypre\cite{hypre2020} on a larger 64-core processor (data distributed as [4,4,4] chunks) the number of communicators needed to expose all possible communication parallelism amounts to $6 \cdot 4^2$ for sides plus $24 \cdot 4^2 - 8$ for the corner diagonal plus $24 \cdot 4^2 - 48$ for the edge diagonals, totalling $808$ communicators.
+The workload would only need a single parallel communication channel for each thread communicating between nodes ideally though, which is only $4^3 - (4-2)^3 = 56$.
+The equations were derived from those used by Zambre and Chandramowlishwaran \cite{zambreLessonsLearned2022}.
+Generating so many communicators is not only complex, it also strains MPI libraries that have to map the many possibly parallel messages to a far smaller number of parallel paths in hardware (as an example Omni-Path only has 160 hardware contexts \cite{intelOmniPath}).
+Since the MPI library lacks the knowledge of the intended communication pattern its mapping to the relevant hardware contexts will be suboptimal.
 
-3) Using Communicators for anything but parallelism introduces either performance loss or limits the portability of the program.
-Since MPI 4.0 lacks standardised hints regarding Communicator usage, MPI libraries need to assume every Communicator is used for expressing parallelism if it parallelises Communicators at all .
-In such a case, if any Communicator is not used for parallelisation, it puts additional strain on the library for no benefit reducing overall performance.
+3) Using communicators to expose parallelism and group processes introduces performance loss or limits the portability across MPI libraries.
+Since MPI 4.0 lacks standardised hints regarding communicator usage, MPI libraries cannot differentiate between communicators used to expose parallelism and those that are used for grouping processes together.
+If a MPI library tries to parallelise across communicators, any communicator that is not used to expose parallelisation puts unneccessary strain on the library, reducing overall performance.
 %todo: find example hint in MPICH or OpenMP
-A software may be written with library specific hints regarding this usage, but doing so binds one to that library to achieve the desired performance \cite{zambreLessonsLearned2022}.
+A program may use library specific hints to specify which communicators are used for what purpose, but doing so makes the program dependent on that MPI library instead of being compatible with any MPI library, at least for the optimal performance \cite{zambreLessonsLearned2022}.
 
-4) Using Communicators for irregular access patterns degrades performance.
-Imagine a taskbased application with $n$ worker threads and $1$ master thread on each node.
-%todo: generate new graphic like "Lessons Learned on MPI+Threads" Fig. 5 but with N nodes to better demonstrate the infeasability of "Duplicating Communicators per communication partner"
-All workers on one node may need to communicate with the master thread of any other node.
-In such a case the software may either generate $n$ Communicator for each worker thread on a node or generate $n \cdot m$ Communicator for all $n$ worker on a node and all $m$ nodes.
-The latter version is infeasable for any non trivial number of nodes as it strains the MPI library for the same reason large multidimensional stencils do.
-So the software is realistically restricted to just $n$ Communicators.
-This then forces the master thread to communicate over teh same Communicators as its workers.
-And as the master thread needs to iterate over all possible Communicators it will contend with its workers to access the Communicators and slow down the application that way.
-This leads to Communicators performing worse than other parallelisation alternatives.
-As example it performed 1.63x worse than Tags with hints in the task-based framework Legion \cite{zambreLogicalParallel2021}.
+4) Using communicators for irregular access patterns degrades performance.
+Imagine a taskbased application with $n$ worker threads and one main thread in each process.
+%todo: generate new graphic like "Lessons Learned on MPI+Threads" Fig. 5 but with N nodes to better demonstrate the infeasability of "Duplicating communicators per communication partner"
+All workers in one process may need to communicate with the main thread of any other process.
+In such a case the software may either generate $n$ communicator for each worker thread in a process or generate $n \cdot m$ communicator for all $n$ worker in a process and all $m$ processes.
+The latter version is infeasable for any non trivial number of processes as it strains the MPI library for the same reason large multidimensional stencils do.
+So the software is realistically restricted to just $n$ communicators.
+This then forces the main thread to communicate over the same communicators as its workers.
+And as the main thread needs to iterate over all possible communicators it will contend with its workers to access the communicators and slow down the application that way.
+This leads to communicators performing worse than other parallelisation alternatives.
+As example communicators performed 1.63x worse than tags with hints in the task-based framework Legion \cite{zambreLogicalParallel2021}.
 
 \subsection{Tags}
 % see Presentation
 \subsection{Partitioned Operations}
 % see Presentation
-\subsection{Sessions}
-
-\section{Lorem Ipsum}
-
-Anmerkung Justus: Der folgende Lorem Ipsum Text ist nur eingefügt damit ich ein Gefühl fürs Layout kriege, er ist natürlich nicht Teil des finalen Papers.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et magna ac felis condimentum molestie sed eu nunc. Nulla dignissim erat a enim faucibus scelerisque. Maecenas sed nisl a orci aliquam tempus sit amet et ligula. Quisque vel rhoncus odio. Aenean euismod, quam a suscipit placerat, nisl eros viverra arcu, et vehicula arcu arcu ac nibh. Proin in erat ac est semper mollis in in neque. Sed vitae tellus tincidunt, sodales risus non, aliquam nunc. Fusce at faucibus arcu. Fusce vulputate mauris eros, at tempor magna pharetra eu. Vivamus ut lorem vitae ipsum porta egestas. Fusce pretium erat at risus suscipit ultricies. Ut mollis, nunc nec tincidunt condimentum, nulla eros pretium magna, ut pulvinar augue turpis sit amet ipsum. Sed a eros at eros tristique dictum. Pellentesque suscipit libero pulvinar, finibus arcu et, gravida arcu.
-
-Nunc ac dui ullamcorper, consequat velit at, porta eros. Ut ac dignissim nulla. Phasellus tincidunt consectetur iaculis. Aliquam dignissim mauris eu augue faucibus, quis mollis nulla scelerisque. Morbi enim diam, tempor et elit sit amet, mollis lacinia orci. Phasellus ornare, sapien at dapibus vehicula, turpis libero bibendum sem, vitae lobortis sem elit et erat. Vivamus pharetra nunc id nunc molestie dignissim. Sed tempor bibendum ipsum, ac volutpat ligula vestibulum non. Sed luctus luctus diam vel faucibus. Vestibulum in facilisis justo, vitae aliquam nunc. Nunc lacinia vehicula arcu. Curabitur luctus ex vel quam ultrices gravida. Mauris elementum sem sit amet nisi hendrerit consectetur id et elit. Donec aliquam eros vitae ligula malesuada egestas.
-
-Maecenas elit tellus, hendrerit sit amet lectus at, suscipit posuere lacus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Quisque vitae vestibulum erat. Phasellus aliquet ligula nec molestie sagittis. Nam et neque vehicula, accumsan sem vitae, efficitur nulla. Maecenas sit amet erat sapien. In scelerisque ligula sit amet ante gravida rhoncus. Etiam non tempor libero. Praesent efficitur imperdiet rutrum. Aliquam non dapibus est. Suspendisse potenti. Sed ac malesuada nisl. Mauris semper id ex sit amet mollis. Nulla massa justo, volutpat id orci et, auctor dictum magna. Suspendisse tincidunt ultrices tortor, vitae mattis ligula tempor non. Suspendisse sollicitudin suscipit mi, vel pulvinar est semper in.
-
-Quisque eleifend vehicula lorem eget placerat. Nullam malesuada odio non porttitor porttitor. Aliquam gravida molestie ligula, at bibendum ipsum sollicitudin sit amet. Duis efficitur posuere massa, sit amet ultricies urna elementum eget. Donec id mauris vitae sem consectetur finibus et at justo. Donec consectetur nisi non nunc viverra, mattis ultricies eros ultricies. Phasellus quis blandit tellus. Sed sodales consequat erat nec rutrum. Suspendisse efficitur nibh neque. Praesent eget placerat lectus. Nam pretium neque vel lectus aliquam egestas. Nulla at placerat quam, vitae tempor metus. Etiam rutrum lacus in metus congue, ut tincidunt sapien porttitor. Cras id orci ut leo ornare commodo at dapibus metus.
-
-Vivamus bibendum, odio id egestas fermentum, diam libero porta lectus, et finibus turpis tortor quis magna. Mauris lorem neque, porta ut dui vel, pellentesque pulvinar nisl. Ut nulla nisl, hendrerit sed rutrum ac, sodales in dui. Integer scelerisque felis arcu, a iaculis massa varius ut. Donec venenatis fringilla magna, sed convallis sem sollicitudin id. Fusce mi elit, ultricies nec laoreet eget, condimentum id nibh. Maecenas aliquam elit quis lectus consectetur hendrerit. Duis ut viverra sem, ac lobortis ex. Curabitur viverra volutpat quam finibus ornare.
-
-Pellentesque aliquet tellus non erat fermentum, commodo vestibulum dolor pulvinar. Etiam scelerisque tortor at tincidunt vulputate. Etiam lobortis nisl erat, ac imperdiet magna semper sit amet. Sed at dictum ex. Aliquam dictum, nisl elementum rutrum feugiat, nisl sapien rutrum augue, quis lacinia nisi massa a mauris. Curabitur fermentum molestie leo vitae faucibus. Phasellus sed ligula nibh. Nam non pharetra nibh, a interdum ipsum. Praesent consequat massa placerat, ornare erat eget, rutrum felis. Praesent vel ex sagittis, euismod sem ut, feugiat augue.
-
-Nam ac sapien id justo vulputate tempus eget nec sapien. Pellentesque nec enim dignissim, dapibus elit vel, aliquam lectus. Etiam ultrices elementum magna at lacinia. Phasellus ac lacus a massa ullamcorper imperdiet eget non turpis. Aliquam euismod tellus in turpis porttitor sollicitudin. Phasellus consectetur, arcu a luctus sodales, tellus ex aliquet odio, in pharetra felis augue et lectus. Nam tristique nec elit vitae tristique. Nunc orci purus, venenatis lobortis pellentesque auctor, pellentesque vitae tortor. Sed metus elit, accumsan at auctor non, convallis vel tortor. Ut sagittis iaculis dapibus. Fusce est ligula, maximus sed sagittis eu, lobortis at nisl. Vestibulum sollicitudin, odio ac cursus fermentum, ante nulla dignissim nisl, ac porttitor felis nisi eget nisl. Aenean id purus eu turpis lobortis feugiat. In ipsum erat, varius sed orci at, egestas rhoncus nisi. Pellentesque vulputate porta urna et tristique. In vel dui a nisi rhoncus varius ac vel metus.
-
-Cras tincidunt justo urna. Nulla purus erat, elementum a nisi et, sollicitudin vestibulum dui. Mauris tristique, augue sed viverra dignissim, velit ligula euismod lectus, sed sollicitudin velit nunc non mi. Sed sodales tellus in arcu mollis, eget porttitor turpis pulvinar. Nunc efficitur aliquam purus, vel venenatis nisl maximus vitae. Donec cursus arcu dolor, et accumsan libero auctor ac. Vestibulum viverra massa ac magna vestibulum, sed fringilla ipsum pulvinar. Aenean id libero posuere, ultrices elit vel, sagittis risus.
-
-Quisque lorem mauris, semper in nibh sed, imperdiet rutrum justo. Sed risus odio, egestas et dolor quis, euismod tempus neque. Morbi mattis fermentum nunc, id commodo risus pharetra at. Etiam accumsan sapien lorem, eu feugiat arcu blandit at. Ut tincidunt id odio ac interdum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Mauris euismod sem magna, a pretium risus venenatis non. Nunc accumsan orci eu justo tristique tincidunt. Suspendisse nibh justo, condimentum eget cursus sed, blandit venenatis quam. Phasellus eros nulla, rhoncus eu hendrerit eu, vestibulum in ligula. Vestibulum nec mollis neque. Aliquam vel mauris et nulla pulvinar sodales. Sed tempor sapien turpis, vitae viverra ligula viverra vitae. Etiam efficitur congue lectus, ac semper velit semper a.
-
-In viverra mollis aliquet. Suspendisse finibus justo quis orci lacinia, sed pharetra sem congue. Mauris at erat lectus. Duis ipsum massa, vulputate non felis rutrum, aliquet aliquet augue. Donec molestie mi a ipsum accumsan faucibus. Etiam lacinia nunc sed varius congue. Phasellus et sollicitudin diam, sit amet vulputate leo. Pellentesque non lorem sodales nisi luctus sollicitudin.
-
-Cras posuere nunc at nulla auctor fermentum. Quisque ullamcorper dolor neque, ac rutrum magna dapibus et. Morbi ut nisl nec leo hendrerit malesuada. Vivamus orci nisl, molestie ac sem ac, elementum viverra augue. Cras quis venenatis lacus. Vestibulum quis rhoncus urna. Suspendisse libero neque, euismod vel molestie eget, lacinia ac enim. Nulla ultrices tempus bibendum. Donec eu felis mauris. Sed eget ligula et purus lacinia fringilla eget quis ligula.
-
-
+% \subsection{Sessions}
 
 %vll. Wort zur Umsetzung in Bibliotheken? OpenMPI und MPICH haben es beide immerhin ...
 

@@ -146,7 +146,28 @@ And as the main thread needs to iterate over all possible communicators it will 
 This leads to communicators performing worse than other parallelisation alternatives.
 As example communicators performed 1.63x worse than tags with hints in the task-based framework Legion \cite{zambreLogicalParallel2021}.
 
-\subsection{Tags}
+\subsection{Tags with Hints}
+
+MPI operations like \verb|MPI_Send| take a \verb|<Rank,Tag,Communicator>| triple as input.
+The tag is sent to differentiate messages between the same processes on a single communicator.
+Normally the MPI standard requires a non-overtaking order for all messages with the same \verb|<Rank,Communicator>| \cite{mpi40}.
+So the default settings do not enable a program to use the additionally sent tags for parallelisation.
+If the program however guarantees MPI, that it will not use the \verb|MPI_ANY_TAG| (a parameter matching all tags), MPI libraries can send different messages between the same ranks but differing tags in arbitrary order.
+
+To use this new avenue to expose parallelism, programs can simply encode the source thread and target thread into the tag.
+A possible implementation is given in FIG. %todo: add figure of sample code
+Using tags comes with some caveats:
+
+As with using communicators to expose parallelism, tags are also used in other contexts than parallelisation.
+So as with communicators a program has to rely on MPI library specific extra hints to clarify which parts of the tag encodes the parallelisation information or risk a suboptimal distribution to the hardware communication channels.
+An example of such extra hints is shown in FIG for the MPI library MPICH. %todo: add MPICH figure
+
+Tags are restricted to 64 bits.
+Depending on the programs other uses for tags this may be a non issue or a dealbreaker.
+Encoding source and target thread in tags for $n$ core processors takes $2\log_2{n}$ bits.
+For a 128 core processors this would mean, that a program reserves $2\log_2{128} = 14$ bits of their tags.
+For most programs this will be irrelevant, but if the program already encodes much information in their tags, exposing parallelisation information might not be feasable.
+
 % see Presentation
 \subsection{Partitioned Operations}
 % see Presentation

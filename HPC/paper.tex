@@ -52,6 +52,8 @@
 % todo: rework
 \section{Introduction}
 
+%vll. Wort zur Umsetzung in Bibliotheken? OpenMPI und MPICH haben es beide immerhin ...
+
 % Historisch MPI-Everywhere
 % heute MPI+OpenMP (warum)
 % Was sind die schwierigkeiten mit MPI+OpenMP
@@ -68,6 +70,8 @@ This includes a brief theoretical look at each method as well as sample code so 
 % this feels like making a buzzword list
 
 % Problemstellung: Wie expose ich logisch Parallele Nachrichten an eine MPI Biblithek (MPICH, OpenMPI) sodass diese es auf parallele Kommunikationswege mappen kann?
+% behandelt nur CPU, keine Acceleratoren
+% reminder: Einleiten was MPI ist, was MPI Bibliotheken sind, populäre nennen (MPICH, OpenMP, IntelMPI?), sagen was OpenMP ist und wofür es genutzt wird, Warum man es zusammen tun sollte,
 
 
 \section{Motivation}
@@ -103,7 +107,6 @@ For MPI versions lower than 4.0 a unique communicators per logical parallel comm
 MPI 4.0 introduced Partitioned Operations to aid efficient parallel communication.
 In Partitioned Operations multiple threads each contribute part of a larger message.
 MPI 4.0 also added new hints, a way for a program to guarantee MPI that it will not use certain features, that can make tags viable for performant parallel communication.
-% todo: MPI Sessions yes or no? -> Read up if time, don't forget graphics and code before though
 Furthermore MPI 4.0 introduced MPI Sessions, which may be used for parallelisation purposes, but are not considered in the scope of this paper.
 In the following subsections this paper will discuss the mentioned methods in more detail.
 
@@ -185,17 +188,24 @@ On the receiving side threads may poll for completion of individual partitions o
 As soon as those return a truthy flag a thread may work on that partitions data.
 There must be a single final call to \verb|MPI_Wait| or \verb|MPI_Test| to complete the operation, before it may be restarted with another call to \verb|MPI_Start|.
 
-This a bit more complicated setup allows an MPI library to transmit the partitions in parallel instead of waiting for all threads to finish working.
+This more complicated setup allows an MPI library to transmit the partitions in parallel instead of waiting for all threads to finish working.
 Partitioned operations are ideally suited to very regular communication, as found in stencil applications.
 They are very ill suited for irregular communication though, as the operations have to be initialised before any communication may happen \cite{zambreLessonsLearned2022}.
 Irregular communication is further complicated by the missing ability to provide wildcards (\verb|MPI_ANY_TAG|, \verb|MPI_ANY_SOURCE|) to \verb|MPI_PRecv_Init| \cite{mpi40}, on which modern task-based runtimes like Legion rely \cite{zambreLessonsLearned2022}.
 
 
+\section{Parallel Remote Memory Access in MPI 4.0}
 
-% see Presentation
-% \subsection{Sessions}
-
-%vll. Wort zur Umsetzung in Bibliotheken? OpenMPI und MPICH haben es beide immerhin ...
+MPI implements Remote Memory Access (RMA) with memory windows.
+In those windows other processes may put data with \verb|MPI_Put| or get data from with \verb|MPI_Get| or their non-blocking alternatives \cite{mpi40}.
+In contrast to point-to-point communication MPI imposes no order requirement for \verb|MPI_Put| and \verb|MPI_Get| operations \cite{mpi40}.
+So for these operations MPI libraries are free to parallelise them as needed.
+MPI windows also allow atomic \verb|MPI_Accumulate| operations.
+This operation updates a target value by adding a number to it atomically.
+MPI imposes strict ordering on \verb|MPI_Accumulate| operations per default.
+If such a ordering guarantee is not needed, Zambre and Chandramowlishwaran list NWChem as an example \cite{zambreLessonsLearned2022}, it may be relaxed on window creation by specifying another \verb|accumulate_ordering|.
+The MPI standard supports specifying no ordering or only a subset of read-after-read, read-after-write, write-after-read, write-after-write in such a case \cite{mpi40}.
+%todo: add example with no ordering
 
 % End, roughly 0.5 pages
 \section{Conclusions}

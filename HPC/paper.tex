@@ -3,8 +3,7 @@
 
 \begin{document}
 
-%todo: look into title
-\title{Efficient Hybrid MPI+OpenMP Programming}
+\title{Efficient MPI+OpenMP Programming with MPI 4.0}
 \author{Dreßler Justus}
 \orcid{0009-0005-0657-5854}
 \affiliation{
@@ -48,16 +47,8 @@
 
 \maketitle
 
-% Introduction, roughly 1 page
-% todo: rework
 \section{Introduction}
 
-%vll. Wort zur Umsetzung in Bibliotheken? OpenMPI und MPICH haben es beide immerhin ...
-
-% Historisch MPI-Everywhere
-% heute MPI+OpenMP (warum)
-% Was sind die schwierigkeiten mit MPI+OpenMP
-% Paper versucht Lösungen zusammenzufassen
 Message Passing Interface is the de facto standard for scaling High Performance Computing (HPC) Workloads across multiple compute nodes.
 This paper will speak of MPI as the standard and refer to MPI implementations like MPICH and OpenMPI as "MPI libraries" going forward.
 These MPI libaries implement the MPI standard while trying to achieve maximum performance while adhearing to it.

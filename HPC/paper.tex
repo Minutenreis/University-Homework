@@ -95,13 +95,13 @@ We will explore how to circumvent such slowdowns in the following section.
 
 
 % Body, roughly 2.5 pages
-\section{Parallel Communication in MPI 4.0}
+\section{Parallel Point-to-Point Communication in MPI 4.0}
 
-There are several ways to implement logical parallel communication efficiently in MPI.
-For MPI versions lower than 4.0 unique communicators may be used per logical parallel communication channel.
+Point-to-Point Communication refers to any communication between 2 different processes.
+There are several ways to implement logical parallel point-to-point communication efficiently in MPI.
+For MPI versions lower than 4.0 a unique communicators per logical parallel communication channel may be used.
 MPI 4.0 introduced Partitioned Operations to aid efficient parallel communication.
 In Partitioned Operations multiple threads each contribute part of a larger message.
-% todo: check that MPI_ANY_TAG is first documented in MPI 4.0 and not already earlier
 MPI 4.0 also added new hints, a way for a program to guarantee MPI that it will not use certain features, that can make tags viable for performant parallel communication.
 % todo: MPI Sessions yes or no? -> Read up if time, don't forget graphics and code before though
 Furthermore MPI 4.0 introduced MPI Sessions, which may be used for parallelisation purposes, but are not considered in the scope of this paper.
@@ -154,7 +154,9 @@ Normally the MPI standard requires a non-overtaking order for all messages with 
 So the default settings do not enable a program to use the additionally sent tags for parallelisation.
 If the program however guarantees MPI, that it will not use the \verb|MPI_ANY_TAG| (a parameter matching all tags), MPI libraries can send different messages between the same ranks but differing tags in arbitrary order.
 
-To use this new avenue to expose parallelism, programs can simply encode the source thread and target thread into the tag.
+To use this new avenue to expose parallelism, programs need to use the \verb|mpi_assert_no_any_tag| hint.
+Now any MPI library is free to parallelise over different tags.
+To use that a program can simply encode the source thread and target thread into the tag.
 A possible implementation is given in FIG. %todo: add figure of sample code
 Using tags comes with some caveats:
 
@@ -168,8 +170,28 @@ Encoding source and target thread in tags for $n$ core processors takes $2\log_2
 For a 128 core processors this would mean, that a program reserves $2\log_2{128} = 14$ bits of their tags.
 For most programs this will be irrelevant, but if the program already encodes much information in their tags, exposing parallelisation information might not be feasable.
 
-% see Presentation
-\subsection{Partitioned Operations}
+\subsection{Partitioned Point-to-Point Communication}
+
+%todo: add sample code
+
+Partitioned Operations are point-to-point operations where the message is partioned into multiple parts.
+
+To implement partitioned point-to-point operations is slightly more difficult than simple \verb|MPI_Send| and \verb|MPI_Recv| calls.
+In contrast to those all operations have to be first initialised on sender and receiver side with \verb|MPI_PSend_Init| and \verb|MPI_PRecv_Init| respectively.
+The initialisation may be done long before the operation is executed.
+To start the execution there must be a single call to \verb|MPI_Start|.
+Then each contributing sending thread may write its part of the message in the shared buffer and then mark its part as ready by calling \verb|MPI_Pready|.
+On the receiving side threads may poll for completion of individual partitions of the message by calling \verb|MPI_Parrived|.
+As soon as those return a truthy flag a thread may work on that partitions data.
+There must be a single final call to \verb|MPI_Wait| or \verb|MPI_Test| to complete the operation, before it may be restarted with another call to \verb|MPI_Start|.
+
+This a bit more complicated setup allows an MPI library to transmit the partitions in parallel instead of waiting for all threads to finish working.
+Partitioned operations are ideally suited to very regular communication, as found in stencil applications.
+They are very ill suited for irregular communication though, as the operations have to be initialised before any communication may happen \cite{zambreLessonsLearned2022}.
+Irregular communication is further complicated by the missing ability to provide wildcards (\verb|MPI_ANY_TAG|, \verb|MPI_ANY_SOURCE|) to \verb|MPI_PRecv_Init| \cite{mpi40}, on which modern task-based runtimes like Legion rely \cite{zambreLessonsLearned2022}.
+
+
+
 % see Presentation
 % \subsection{Sessions}
 

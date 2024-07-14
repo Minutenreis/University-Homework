@@ -4,7 +4,7 @@
 \begin{document}
 
 %todo: look into title
-\title{Parallelising Hybrid MPI Programms efficiently}
+\title{Efficient Hybrid MPI+OpenMP Programming}
 \author{Dreßler Justus}
 \orcid{0009-0005-0657-5854}
 \affiliation{
@@ -58,32 +58,37 @@
 % heute MPI+OpenMP (warum)
 % Was sind die schwierigkeiten mit MPI+OpenMP
 % Paper versucht Lösungen zusammenzufassen
-Message Passing Interface is the de facto standard for scaling High Performance Computing (HPC) Workloads across nodes.
-Historically applications relied on the memory wasteful model of MPI-Everywhere to achieve good scalability across nodes.
-In the last decades however a rapid increase in core counts per CPU neccessitated a switch to MPI+OpenMP to better use newer CPU's ressources.
-While this did work, it brought fourth new challenges in designing software for HPC workloads.
-The main pain point is the much harder to achieve parallel communication in MPI+OpenMP compared to MPI-Everywhere.
-The newest MPI version (4.0) introduced new ways to expose communication parallelism in MPI software to ease this pain point.
-So this paper tries to give an overview over the current ways to expose parallel communication to build scalable MPI+OpenMP software.
-This includes a brief theoretical look at each method as well as sample code so developers may apply these methods to their own software.
+Message Passing Interface is the de facto standard for scaling High Performance Computing (HPC) Workloads across multiple compute nodes.
+This paper will speak of MPI as the standard and refer to MPI implementations like MPICH and OpenMPI as "MPI libraries" going forward.
+These MPI libaries implement the MPI standard while trying to achieve maximum performance while adhearing to it.
+To do so some libraries include extra library specific settings as hints, which the library user can set to increase possible performance.
+Sometimes these libraries will also include entirely new ways to parallelise communication like MPIX\_Stream \cite{Zhou2022}, but this paper will focus mainly on the MPI standard itself.
 
-% this feels like making a buzzword list
+Traditionally applications relied on the memory-hungry MPI-Everywhere model \cite{zambreLessonsLearned2022}.
+In the last decades however a rapid increase in core counts per CPU relative to other on-node resources neccessitated a switch to a model of MPI+X,
+where MPI is used to parallise between different nodes and X is used to parallelise on each node.
+Some popular choices for this second X part are CPU multithreading libraries like OpenMP or POSIX Threads, GPU Acceleration with CUDA or using MPI with Remote Memory Access calls.
+This paper will focus on MPI+OpenMP, though many aspects of this paper also apply for any other CPU multithreading library.
 
-% Problemstellung: Wie expose ich logisch Parallele Nachrichten an eine MPI Biblithek (MPICH, OpenMPI) sodass diese es auf parallele Kommunikationswege mappen kann?
-% behandelt nur CPU, keine Acceleratoren
-% reminder: Einleiten was MPI ist, was MPI Bibliotheken sind, populäre nennen (MPICH, OpenMP, IntelMPI?), sagen was OpenMP ist und wofür es genutzt wird, Warum man es zusammen tun sollte,
+OpenMP is a popular library for generating shared-memory multithreaded programs.
+It works under the fork join model, where a main thread does all the serial work and additional threads get spawned for multithreading when needed.
+It is easy to add to existing serial code, mostly by adding comments called pragmas in front of loops.
+Its ease of use also makes it popular for developing HPC software.
+MPI+OpenMP programs tend to perform worse than their MPI-Everywhere counterparts \cite{zambreLessonsLearned2022}\cite{zambreLogicalParallel2021}.
+The main problem being extra unneeded thread synchronization overheads \cite{zambreLessonsLearned2022} and less exposure of parallelism for MPI libraries to use.
 
+This paper gives an overview of ways to expose parallelism in communication to MPI libaries to achieve maximum performance.
+For this it will discuss mainly point-to-point communication. It compares traditional methods like generating multiple MPI communicators with the newer features of MPI 4.0, which introduced new hints to make tags a viable method of exposing parallelisation and added new partitioned operations which can gather contributions of multiple threads in parallel.
 
 \section{Motivation}
 The historically preferred method of MPI-Everywhere made logical parallelism easy to express in software.
-%todo: cite or rework
-It did however have massive problems with memory management.
+It does however use up more memory and other on chip ressources relative to MPI+OpenMP.
 Classical MPI-Everywhere programs spawn a single process per core available.
 MPI+OpenMP programs normally spawn a single process per node or NUMA domain \cite{zambreLessonsLearned2022}.
 
-%todo: cite MPI 3 Standard
-A MPI communicator is a construct that defines which processes may talk with each other.
-Each MPI process is required to keep a list of all participating MPI processes in the default communicator \verb|MPI_COMM_WORLD|.
+MPI point-to-point communication runs on so called communicators.
+A MPI communicator defines which processes may talk with each other.
+Each MPI process is required to keep a list of all participating MPI processes in the default communicator \verb|MPI_COMM_WORLD| \cite{mpi40}.
 Assuming an $n$ core processor $n$ copies of the list are lying in each nodes memory in the MPI-Everywhere model.
 An equivalent MPI+OpenMP program shares its list between its cores and also spawns $n$ times less processes, so \verb|MPI_COMM_WORLD| is $n$ times smaller and $n$ times less often on each processor.
 For current generation processors exceeding 100 cores like Intel® Xeon® 6 \cite{intelXeon6} or 4th Generation AMD EPYC™ \cite{amd4thGenEpyc} this equates to a reduction of \verb|MPI_COMM_WORLD|'s memory consumption of over $n^2 > 10.000$ times.
@@ -152,7 +157,7 @@ As example communicators performed 1.63x worse than tags with hints in the task-
 \subsection{Tags with Hints}
 
 MPI operations like \verb|MPI_Send| take a \verb|<Rank,Tag,Communicator>| triple as input.
-The tag is sent to differentiate messages between the same processes on a single communicator.
+The tag is included to differentiate messages between the same processes on a single communicator.
 Normally the MPI standard requires a non-overtaking order for all messages with the same \verb|<Rank,Communicator>| \cite{mpi40}.
 So the default settings do not enable a program to use the additionally sent tags for parallelisation.
 If the program however guarantees MPI, that it will not use the \verb|MPI_ANY_TAG| (a parameter matching all tags), MPI libraries can send different messages between the same ranks but differing tags in arbitrary order.

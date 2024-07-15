@@ -1,5 +1,6 @@
 \documentclass[sigconf]{acmart}
 \usepackage{booktabs}
+\usepackage{listings}
 
 \begin{document}
 
@@ -30,18 +31,15 @@
 
 \ccsdesc[500]{Computing methodologies~Parallel computing methodologies}
 
+% todo: revisit?
 \begin{abstract}
 
-    %TODO: add abstract
-    Lorem Ipsum dolor sit amet, consectetur adipiscing elit.
-    Mauris dictum quam eget orci porttitor ultrices.
-    Suspendisse purus nisl, dapibus et rhoncus in, eleifend id quam. Integer volutpat dolor urna, non auctor magna sodales non.
-    Ut in fermentum erat, lacinia malesuada urna.
-    Nullam et dolor ut purus fermentum rutrum.
-    Suspendisse non velit sollicitudin, rutrum est at, commodo sem. Pellentesque viverra tincidunt mauris ut egestas.
-    Integer vel orci sapien. Sed ut mi at lacus vehicula fermentum.
-    Integer euismod vestibulum auctor.
-    Nunc vulputate leo eget aliquam bibendum.
+    Hybrid MPI+X programming is the current standard for High Performance Computing Applications.
+    Parallelising within a process poses new challenges for efficient programs though.
+    A main problem is communicating logical parallelism in the application to the MPI Libaries like MPICH or OpenMPI.
+    The new MPI 4.0 standard assists application developers with new hints and partitioned operations to simplify the exposure of that parallelism.
+    This paper summarizes the operations in current MPI 4.0, gives examples of how to apply them and gives recommendations based on the applications structure.
+
 
 \end{abstract}
 
@@ -68,7 +66,7 @@ Its ease of use also makes it popular for developing HPC software.
 MPI+OpenMP programs tend to perform worse than their MPI-Everywhere counterparts \cite{zambreLessonsLearned2022}\cite{zambreLogicalParallel2021}.
 The main problem being extra unneeded thread synchronization overheads \cite{zambreLessonsLearned2022} and less exposure of parallelism for MPI libraries to use.
 
-This paper gives an overview of ways to expose parallelism in communication to MPI libaries to achieve maximum performance.
+This paper gives an overview of ways to expose parallelism in communication to MPI libaries to achieve optimal performance (over 2x increase for communication-intensive programs \cite{zambreLogicalParallel2021}).
 For this it will discuss mainly point-to-point communication. It compares traditional methods like generating multiple MPI communicators with the newer features of MPI 4.0, which introduced new hints to make tags a viable method of exposing parallelisation and added new partitioned operations which can gather contributions of multiple threads in parallel.
 
 \section{Motivation}
@@ -108,60 +106,97 @@ In the following subsections this paper will discuss the mentioned methods in mo
 
 \subsection{Communicator}
 
-%todo: is simple the right word? most backwards compatible?
 The simplest though maybe not most intuitive way to parallelise communication is to assign each logical parallel message its own communicator.
-Since MPI gives no implies no relative ordering on different communicators \cite{zambreLessonsLearned2022}, libraries can map messages on different communicators to different underlying message channels.
+Since MPI implies no relative ordering on different communicators \cite{zambreLessonsLearned2022}, libraries can map messages on different communicators to different underlying message channels.
 To use different communicator an MPI application developer needs to be aware of a few key problems:
 
-1) For optimal parallelisation there needs to be two communicator for each pair of threads communicating between different processes.
-%todo: insert figure, also link figure
-%todo: possibly code for that same figure so the complexity can be better judged by a reader?
-To demonstrate the need for two communicator per pair of threads imagine a problem devided into a line of Nodes.
-If only one communicator is used per pair of threads, communication between \verb|<Rank_0,Thread_5>| and \verb|<Rank_1,Thread_3>| shares its communicator with the communication between \verb|<Rank_1,Thread_5>| and \verb|<Rank_2,Thread_3>|.
-This is problematic since the messages from \verb|Rank_0| and \verb|Rank_2| to \verb|Rank_1| now run on the same communicator and with that those two exchanges are no longer independent.
+\begin{figure}
+    \caption{
+        For ideal communication parallelism for 9 thread processes with a 3x3 grid that communicate along an axis, the left and right communicators on each process have to be distinct to avoid dependencies between left and right connections.
+        Each unique colour represents a unique connector in the picture.
+    }
+    \Description[]{3x3 thread processes communicating along a single axis and the associated 3-point stencil oriented in parallelisation direction}
+    \includegraphics[width=0.47\textwidth]{Communicator_Line.png}
+    \label{fig:Communicator_Line}
+\end{figure}
 
-2) For large multidimensional stencils the number of communicators needed grows rapidly and an MPI program using those should consider other methods to expose parallelisation.
+\begin{figure}
+    \caption{3-point stencil used in Figure \ref{fig:Communicator_Line}}
+    \Description[]{3-point stencil in parallelisation direction}
+    \includegraphics[width=0.23\textwidth]{3_point_stencil.png}
+    \label{fig:3pointStencil}
+\end{figure}
+
+\begin{figure}
+    \caption{C++ implementation of Figure \ref{fig:Communicator_Line}}
+    \Description[]{Code for 3x3 thread processes figure}
+    \includegraphics[width=0.47\textwidth]{Communicator_Line_CPP.png}
+    \label{fig:Communicator_Line_CPP}
+\end{figure}
+
+\textbf{1)} \textit{For optimal parallelisation there needs to be two communicator for each pair of threads communicating between different processes.}
+To demonstrate the need for two communicators per pair of threads, imagine a problem where processes communicate along a single axis as in Figure \ref{fig:Communicator_Line}.
+If only one communicator is used per pair of threads, communication between \verb|<Rank_0,Thread_5>| and \verb|<Rank_1,Thread_3>| shares its communicator with the communication between \verb|<Rank_1,Thread_5>| and \verb|<Rank_2,Thread_3>|.
+This is problematic since the messages from \verb|Rank_0| and \verb|Rank_2| to \verb|Rank_1| now run on the same communicator and the two exchanges are no longer independent.
+A sample implementation can be seen in Figure \ref{fig:Communicator_Line_CPP}.
+
+\textbf{2)} \textit{For large multidimensional stencils the number of communicators needed grows rapidly and an MPI program using those should consider other methods to expose parallelisation.}
 For more complex stencils like a 27-point 3D stencil as seen in Hypre\cite{hypre2020} on a larger 64-core processor (data distributed as [4,4,4] chunks) the number of communicators needed to expose all possible communication parallelism amounts to $6 \cdot 4^2$ for sides plus $24 \cdot 4^2 - 8$ for the corner diagonal plus $24 \cdot 4^2 - 48$ for the edge diagonals, totalling $808$ communicators.
 The workload would only need a single parallel communication channel for each thread communicating between nodes ideally though, which is only $4^3 - (4-2)^3 = 56$.
 The equations were derived from those used by Zambre and Chandramowlishwaran \cite{zambreLessonsLearned2022}.
 Generating so many communicators is not only complex, it also strains MPI libraries that have to map the many possibly parallel messages to a far smaller number of parallel paths in hardware (as an example Omni-Path only has 160 hardware contexts \cite{intelOmniPath}).
 Since the MPI library lacks the knowledge of the intended communication pattern its mapping to the relevant hardware contexts will be suboptimal.
 
-3) Using communicators to expose parallelism and group processes introduces performance loss or limits the portability across MPI libraries.
+\textbf{3)} \textit{Using communicators to expose parallelism and group processes introduces performance loss or limits the portability across MPI libraries.}
 Since MPI 4.0 lacks standardised hints regarding communicator usage, MPI libraries cannot differentiate between communicators used to expose parallelism and those that are used for grouping processes together.
 If a MPI library tries to parallelise across communicators, any communicator that is not used to expose parallelisation puts unneccessary strain on the library, reducing overall performance.
-%todo: find example hint in MPICH or OpenMP
-A program may use library specific hints to specify which communicators are used for what purpose, but doing so makes the program dependent on that MPI library instead of being compatible with any MPI library, at least for the optimal performance \cite{zambreLessonsLearned2022}.
+A MPI libary may provide extra hints to specify which communicators are used to expose parallelism, but using those makes the performance of the program depend on that library and makes swapping of libraries harder.
 
-4) Using communicators for irregular access patterns degrades performance.
-Imagine a taskbased application with $n$ worker threads and one main thread in each process.
-%todo: generate new graphic like "Lessons Learned on MPI+Threads" Fig. 5 but with N nodes to better demonstrate the infeasability of "Duplicating communicators per communication partner"
+\begin{figure}
+    \caption{processes with N worker and 1 main thread communicating irregularly; each worker thread needs to be able to communicate with all other main threads; Each coloured connection represents a unique communicator}
+    \Description[]{3 Nodes with 1 main thread and N worker threads, from each worker thread there is a connection to all other main threads, each connection is coloured by the thread id of the worker thread}
+    \includegraphics[width=0.47\textwidth]{Communicator_Irregular.png}
+    \label{fig:Communicator_Irregular}
+\end{figure}
+
+\textbf{4)} \textit{Using communicators for irregular access patterns degrades performance.}
+Imagine a taskbased application with $n$ worker threads and one main thread in each process as depicted in Figure \ref{fig:Communicator_Irregular}.
 All workers in one process may need to communicate with the main thread of any other process.
 In such a case the software may either generate $n$ communicator for each worker thread in a process or generate $n \cdot m$ communicator for all $n$ worker in a process and all $m$ processes.
-The latter version is infeasable for any non trivial number of processes as it strains the MPI library for the same reason large multidimensional stencils do.
+The latter version is infeasable for any non trivial number of processes as it generates way more communicators which strains the MPI library for the same reason large multidimensional stencils do.
 So the software is realistically restricted to just $n$ communicators.
 This then forces the main thread to communicate over the same communicators as its workers.
 And as the main thread needs to iterate over all possible communicators it will contend with its workers to access the communicators and slow down the application that way.
 This leads to communicators performing worse than other parallelisation alternatives.
-As example communicators performed 1.63x worse than tags with hints in the task-based framework Legion \cite{zambreLogicalParallel2021}.
+As an example communicators performed 1.63x worse than tags with hints in the task-based framework Legion \cite{zambreLogicalParallel2021}.
 
 \subsection{Tags with Hints}
 
-MPI operations like \verb|MPI_Send| take a \verb|<Rank,Tag,Communicator>| triple as input.
+MPI operations like \verb|MPI_SEND| take a \verb|<Rank,Tag,Communicator>| triple as input.
 The tag is included to differentiate messages between the same processes on a single communicator.
 Normally the MPI standard requires a non-overtaking order for all messages with the same \verb|<Rank,Communicator>| \cite{mpi40}.
 So the default settings do not enable a program to use the additionally sent tags for parallelisation.
 If the program however guarantees MPI, that it will not use the \verb|MPI_ANY_TAG| (a parameter matching all tags), MPI libraries can send different messages between the same ranks but differing tags in arbitrary order.
 
 To use this new avenue to expose parallelism, programs need to use the \verb|mpi_assert_no_any_tag| hint.
+
+\begin{figure}
+    \caption{
+        To encode source and destination into a tag they can simply be appended to the left side, given there is still space.
+    }
+    \Description[]{Code to encode source and target into tag}
+    \includegraphics[width=0.47\textwidth]{Tags_CPP.png}
+    \label{fig:Tags_CPP}
+\end{figure}
+
 Now any MPI library is free to parallelise over different tags.
 To use that a program can simply encode the source thread and target thread into the tag.
-A possible implementation is given in FIG. %todo: add figure of sample code
+If the \verb|MPI_ANY_TAG| is needed for application logic, but the order of the operations getting matched is irrelevant, the program may instead use the \verb|mpi_assert_allow_overtaking| to ignore the non-overtaking behaviour completely on a communicator.
+A possible implementation is given in Figure \ref{fig:Tags_CPP}.
 Using tags comes with some caveats:
 
-As with using communicators to expose parallelism, tags are also used in other contexts than parallelisation.
-So as with communicators a program has to rely on MPI library specific extra hints to clarify which parts of the tag encodes the parallelisation information or risk a suboptimal distribution to the hardware communication channels.
-An example of such extra hints is shown in FIG for the MPI library MPICH. %todo: add MPICH figure
+As with communicators the other uses of tags may strain a library more than needed and as with communicators libraries may include extra hints to help the mapping of tags to hardware channels.
+But using those hints once again binds the program performance to a specific library and makes swapping libraries harder.
 
 Tags are restricted to 64 bits.
 Depending on the programs other uses for tags this may be a non issue or a dealbreaker.
@@ -175,36 +210,48 @@ For most programs this will be irrelevant, but if the program already encodes mu
 
 Partitioned Operations are point-to-point operations where the message is partioned into multiple parts.
 
-To implement partitioned point-to-point operations is slightly more difficult than simple \verb|MPI_Send| and \verb|MPI_Recv| calls.
-In contrast to those all operations have to be first initialised on sender and receiver side with \verb|MPI_PSend_Init| and \verb|MPI_PRecv_Init| respectively.
+To implement partitioned point-to-point operations is slightly more difficult than simple \verb|MPI_SEND| and \verb|MPI_RECV| calls.
+In contrast to those all operations have to be first initialised on sender and receiver side with \verb|MPI_PSEND_INIT| and \verb|MPI_PRECV_INIT| respectively.
 The initialisation may be done long before the operation is executed.
-To start the execution there must be a single call to \verb|MPI_Start|.
-Then each contributing sending thread may write its part of the message in the shared buffer and then mark its part as ready by calling \verb|MPI_Pready|.
-On the receiving side threads may poll for completion of individual partitions of the message by calling \verb|MPI_Parrived|.
+To start the execution there must be a single call to \verb|MPI_START|.
+Then each contributing sending thread may write its part of the message in the shared buffer and then mark its part as ready by calling \verb|MPI_PREADY|.
+On the receiving side threads may poll for completion of individual partitions of the message by calling \verb|MPI_PARRIVED|.
 As soon as those return a truthy flag a thread may work on that partitions data.
-There must be a single final call to \verb|MPI_Wait| or \verb|MPI_Test| to complete the operation, before it may be restarted with another call to \verb|MPI_Start|.
+There must be a single final call to \verb|MPI_WAIT| or \verb|MPI_TEST| to complete the operation, before it may be restarted with another call to \verb|MPI_START|.
 
 This more complicated setup allows an MPI library to transmit the partitions in parallel instead of waiting for all threads to finish working.
 Partitioned operations are ideally suited to very regular communication, as found in stencil applications.
 They are very ill suited for irregular communication though, as the operations have to be initialised before any communication may happen \cite{zambreLessonsLearned2022}.
-Irregular communication is further complicated by the missing ability to provide wildcards (\verb|MPI_ANY_TAG|, \verb|MPI_ANY_SOURCE|) to \verb|MPI_PRecv_Init| \cite{mpi40}, on which modern task-based runtimes like Legion rely \cite{zambreLessonsLearned2022}.
+Irregular communication is further complicated by the missing ability to provide wildcards (\verb|MPI_ANY_TAG|, \verb|MPI_ANY_SOURCE|) to \verb|MPI_PRECV_INIT| \cite{mpi40}, on which modern task-based runtimes like Legion rely \cite{zambreLessonsLearned2022}.
 
 
 \section{Parallel Remote Memory Access in MPI 4.0}
 
-MPI implements Remote Memory Access (RMA) with memory windows.
-In those windows other processes may put data with \verb|MPI_Put| or get data from with \verb|MPI_Get| or their non-blocking alternatives \cite{mpi40}.
-In contrast to point-to-point communication MPI imposes no order requirement for \verb|MPI_Put| and \verb|MPI_Get| operations \cite{mpi40}.
+Remote Memory Accesses (RMA) are one sided communication, where the target does not need to do anything after the initialisation.
+Those operations are only allowed on specific sections of their memory called windows in MPI.
+To create such a window, all processes in a communicator have to call \verb|MPI_WIN_CREATE|.
+They may specify different memory sizes for their window, including specifying \verb|size=0| to not expose any memory themselves.
+In those windows other processes may put data with \verb|MPI_PUT| or get data from with \verb|MPI_GET| or their non-blocking alternatives \cite{mpi40}.
+These RMA operations are not matched on the destination, hence being called one-sided.
+In contrast to point-to-point communication MPI imposes no order requirement for \verb|MPI_PUT| and \verb|MPI_GET| operations \cite{mpi40}.
 So for these operations MPI libraries are free to parallelise them as needed.
-MPI windows also allow atomic \verb|MPI_Accumulate| operations.
+MPI windows also allow atomic \verb|MPI_ACCUMULATE| operations.
 This operation updates a target value by adding a number to it atomically.
-MPI imposes strict ordering on \verb|MPI_Accumulate| operations per default.
+MPI imposes strict ordering on \verb|MPI_ACCUMULATE| operations per default.
 If such a ordering guarantee is not needed, Zambre and Chandramowlishwaran list NWChem as an example \cite{zambreLessonsLearned2022}, it may be relaxed on window creation by specifying another \verb|accumulate_ordering|.
 The MPI standard supports specifying no ordering or only a subset of read-after-read, read-after-write, write-after-read, write-after-write in such a case \cite{mpi40}.
 %todo: add example with no ordering
 
 % End, roughly 0.5 pages
 \section{Conclusions}
+
+In this paper I demonstrate multiple ways to expose communication parallelism to MPI libraries in MPI 4.0 while using CPU multithreading.
+It has been demonstrated that communication can be a significant bottleneck and exposing available parallelism to MPI libraries increase performance by over 2x for some applications \cite{zambreLogicalParallel2021}.
+From the described methods I would recommend tags with hints if the application is allowed to depend on a specific MPI library and does not rely on \verb|MPI_ANY_TAG|.
+It is the easiest to include into existing applications and performs no worse than its alternatives \cite{zambreLessonsLearned2022}.
+Any of the described methods will work for most application types though.
+
+
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{citations}
 

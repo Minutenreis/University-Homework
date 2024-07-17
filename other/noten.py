@@ -38,6 +38,7 @@ noten = [
     (1.3,6), # IT-Sicherheit 
     (2.7,6), # Algorithmisches Beweisen
     (1.3,3), # Projektmanagement (ASQ) 
+    (2.3,6), # Mathematische Methoden der Physik I
     ]
 
 (avg, ects) = calcSchnitt(noten)

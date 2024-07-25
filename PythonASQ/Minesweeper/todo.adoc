@@ -1,0 +1,51 @@
+== Tasks
+
+Each Cell needs to know:
+
+* [ ] If it is a mine
+* [ ] If it is flagged
+* [ ] If it is revealed
+* [ ] If it is questioned
+* [ ] How many mines are surrounding it
+
+ToDo:
+
+* [ ] Generate Grid with randomised mines (-1) [do this after the first click, if the first click is a mine, move it to a different cell]
+* [ ] Generate Numbers based on surrounding mines (0-8)
+* [ ] create "click" function that
+** [ ] reveals cell if not a mine
+** [ ] reveals all surrounding cells if cell is 0 (queue? recursion?)
+** [ ] ends game if cell is a mine
+* [ ] create "flag" function that
+** [ ] if cell is not flagged and not questioned, flag it
+** [ ] if cell is flagged, question and unflag it
+** [ ] if cell is questioned, unquestion it
+** [ ] ends game if all mines are flagged
+** [ ] updates mine count (important: there have to be 2 mine counts, one visible for the player and one to actually check if the game is won)
+* [ ] create "new game" function that
+** [ ] resets the grid
+** [ ] resets the mine count
+** [ ] resets the clock
+* [ ] create "end game" function that
+** [ ] stops the clock
+** [ ] reveals all mines
+** [ ] disables all cells
+** [ ] shows a message if the game was won or lost
+* [ ] create "save highscore" function
+** [ ] saves the time of the player if the game was won and the player is in the top 5
+** [ ] writes the new highscore table to disk
+* [ ] create "load highscore" function
+** [ ] reads the highscore table from disk
+* [ ] add "ask AI for help" function
+** [ ] needs to logically check the revealed grid for mines / save cells
+* [ ] generate GUI
+** [ ] add timer
+** [ ] add mine counter
+** [ ] add new game button
+** [ ] add end game button
+** [ ] add grid
+*** [ ] add click function to grid (lmb)
+*** [ ] add flag function to grid (rmb)
+*** [ ] display number if 1-8, nothing if 0, mine if -1
+*** [ ] display flag if flagged
+

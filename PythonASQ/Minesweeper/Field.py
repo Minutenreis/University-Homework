@@ -78,6 +78,9 @@ class Field:
         if self.field[x][y].isRevealed:
             return
         if not self.field[x][y].isFlagged and not self.field[x][y].isQuestioned:
+            # can't flag more mines than there are
+            if self.minesLeft == 0:
+                return
             self.field[x][y].isFlagged = True
             self.minesLeft -= 1
         elif self.field[x][y].isFlagged:
@@ -89,11 +92,13 @@ class Field:
         
     
     def reveal(self, x, y):
+        if self.field[x][y].isFlagged or self.field[x][y].isQuestioned:
+            return
         if self.firstGuess:
             while self.field[x][y].isMine:
                 # todo: might be slow, need to validate inputs too
-                self.generateField(len(self.field), len(self.field[0]), self.minesActual)
-                self.firstGuess = False
+                self.generateField(len(self.field), len(self.field[0]), self.mines)
+            self.firstGuess = False
         if self.field[x][y].isRevealed:
             return
         self.field[x][y].isRevealed = True

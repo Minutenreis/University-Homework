@@ -38,13 +38,15 @@ ToDo:
 * [ ] add "ask AI for help" function
 ** [ ] needs to logically check the revealed grid for mines / save cells
 * [ ] generate GUI
-** [ ] add timer
-** [ ] add mine counter
-** [ ] add new game button
-** [ ] add end game button
-** [ ] add grid
-*** [ ] add click function to grid (lmb)
-*** [ ] add flag function to grid (rmb)
-*** [ ] display number if 1-8, nothing if 0, mine if -1
-*** [ ] display flag if flagged
+** [ ] add difficulty selection
+** [ ] add highscore table
+** [x] add timer
+** [x] add mine counter
+** [x] add new game button
+** [x] add end game button
+** [x] add grid
+*** [x] add click function to grid (lmb)
+*** [x] add flag function to grid (rmb)
+*** [x] display number if 1-8, nothing if 0, mine if -1
+*** [x] display flag if flagged
 

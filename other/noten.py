@@ -33,8 +33,10 @@ noten = [
     (1.0,6), # Kryptologie
     (2.3,6), # Einführung in die Künstliche Intelligenz
     (1.3,6), # Projekt - Paralleles Rechnen 
-    (1.0,6), # Parallel Computing I  
+    (1.0,6), # Parallel Computing I 
+    (1.0,6), # Parallel Computing II 
     # C
+    (1.7,3), # Seminar High-Performance Computing
     (1.3,6), # IT-Sicherheit 
     (2.7,6), # Algorithmisches Beweisen
     (1.3,3), # Projektmanagement (ASQ) 

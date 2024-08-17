@@ -52,4 +52,6 @@ ToDo:
 
 * [ ] add "ask AI for help" function
 ** [ ] needs to logically check the revealed grid for mines / save cells
-
+*** [ ] First Try: Check each revealed field
+**** if all its mines are flagged, if so reveal all other fields
+**** if the number of unflagged mines is equal to the number of hidden fields, flag all hidden fields

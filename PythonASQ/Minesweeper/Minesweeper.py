@@ -80,7 +80,7 @@ class Menu:
         highscores = loadHighscores()
         for i, difficulty in enumerate(difficulties):
             highscore_difficulty = highscores[difficulty]
-            highscore_string = "\n".join([datetime.fromtimestamp(score).strftime("%M:%S") for score in highscore_difficulty])
+            highscore_string = "\n".join([datetime.fromtimestamp(score).strftime("%M:%S") if score != 0 else "--:--" for score in highscore_difficulty])
             difficulty_header = tk.Label(self.root, text=highscore_string)
             difficulty_header.grid(row=i+1, column=1)
         

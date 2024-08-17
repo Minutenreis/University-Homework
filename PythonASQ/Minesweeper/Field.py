@@ -55,14 +55,11 @@ class Field:
     def loseGame(self):
         self.__revealAllMines()
         self.disabled = True
-        # todo: show dialog with "game is lost" "try again" "show Highscores" "exit"
     
     def winGame(self):
         self.__revealAllMines()
         self.disabled = True
         self.win = True
-        # todo: show dialog with "game is lost" "try again" "show Highscores" "exit"
-        # todo: save highscore
     
     def newGame(self):
         self.__init__(self.x, self.y, self.mines)
@@ -107,16 +104,3 @@ class Field:
         if self.revealed == len(self.field) * len(self.field[0]) - self.mines:
             self.winGame()
             return
-                        
-def loadHighscores():
-    # check if savefile exists, if not return empty list
-    pass
-
-def saveHighscore(time: int, mode: str):
-    # load highscores
-    # if no highscores exist, create file
-    # add highscore to list of mode
-    # sort list
-    # cut off top 5 again
-    # save highscores
-    pass              

@@ -2,13 +2,13 @@
 
 Each Cell needs to know:
 
-* [ ] If it is a mine
-* [ ] If it is flagged
-* [ ] If it is revealed
-* [ ] If it is questioned
-* [ ] How many mines are surrounding it
+* [x] If it is a mine
+* [x] If it is flagged
+* [x] If it is revealed
+* [x] If it is questioned
+* [x] How many mines are surrounding it
 
-ToDo:
+Done: 
 
 * [x] Generate Grid with randomised mines (-1) [do this before the first click, if the first click is a mine, move it to a different cell]
 * [x] Generate Numbers based on surrounding mines (0-8)
@@ -30,16 +30,14 @@ ToDo:
 ** [x] reveals all mines
 ** [x] disables all cells
 ** [x] shows a message if the game was won or lost
-* [ ] create "save highscore" function
-** [ ] saves the time of the player if the game was won and the player is in the top 5
-** [ ] writes the new highscore table to disk
-* [ ] create "load highscore" function
-** [ ] reads the highscore table from disk
-* [ ] add "ask AI for help" function
-** [ ] needs to logically check the revealed grid for mines / save cells
-* [ ] generate GUI
-** [ ] add difficulty selection
-** [ ] add highscore table
+* [x] create "save highscore" function
+** [x] saves the time of the player if the game was won and the player is in the top 5
+** [x] writes the new highscore table to disk
+* [x] create "load highscore" function
+** [x] reads the highscore table from disk
+* [x] generate GUI
+** [x] add difficulty selection
+** [x] add highscore table
 ** [x] add timer
 ** [x] add mine counter
 ** [x] add new game button
@@ -49,4 +47,9 @@ ToDo:
 *** [x] add flag function to grid (rmb)
 *** [x] display number if 1-8, nothing if 0, mine if -1
 *** [x] display flag if flagged
+
+ToDo:
+
+* [ ] add "ask AI for help" function
+** [ ] needs to logically check the revealed grid for mines / save cells
 

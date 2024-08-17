@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from datetime import datetime
 from Field import Field
@@ -10,6 +11,31 @@ def main():
 def clearChildren(parent):
     for widget in parent.winfo_children():
         widget.destroy()
+        
+# Highscores.txt is formatted as 20 lines, first 5 are easy, next 5 are medium, next 5 are hard, last 5 are custom
+def loadHighscores() -> dict:
+    if os.path.exists("highscores.txt"):
+        with open("highscores.txt", "r") as file:
+            lines = file.readlines()
+            highscores = {"Easy 8x8": [], "Medium 16x16": [], "Hard 30x16": [], "Custom": []}
+            for i, line in enumerate(lines):
+                highscores[list(highscores.keys())[i//5]].append(int(line))
+            return highscores
+    else:
+        return {
+            "Easy 8x8": [0,0,0,0,0], 
+            "Medium 16x16": [0,0,0,0,0], 
+            "Hard 30x16": [0,0,0,0,0], 
+            "Custom": [0,0,0,0,0]
+                }
+
+# expects highscores as dict with 4 keys and each key has a list of 5 integers
+def saveHighscores(highscores: dict):
+    with open("highscores.txt", "w") as file:
+        for difficulty in highscores:
+            for score in highscores[difficulty]:
+                file.write(str(score)+"\n")
+
 
 class Menu:
 
@@ -21,12 +47,16 @@ class Menu:
         
         difficulties = ["Easy 8x8", "Medium 16x16", "Hard 30x16", "Custom"]
         difficultyButtons = []
+        
+        # Difficulty Buttons
+        difficulty_header = tk.Label(self.root, text="Choose Difficulty", anchor=tk.W)
+        difficulty_header.grid(row=0, column=0, sticky=tk.W)
         for i, difficulty in enumerate(difficulties):
             button = tk.Radiobutton(self.root, text=difficulty, variable=self.difficulty, value=difficulty)
-            button.grid(row=i, column=0, sticky=tk.W)
+            button.grid(row=i+1, column=0, sticky=tk.W)
             difficultyButtons.append(button)
         self.frame = tk.Frame(self.root)
-        self.frame.grid(row=len(difficulties), column=0, sticky=tk.W)
+        self.frame.grid(row=len(difficulties)+1, column=0, sticky=tk.W)
         self.difficulty.trace_add("write",self.showCustom)
         self.x = tk.StringVar()
         self.x.set(16)
@@ -44,13 +74,22 @@ class Menu:
         self.y.trace_add("write", self.genValidate(self.y, self.yValue, 1, 30))
         self.mines.trace_add("write", self.genValidate(self.mines, self.minesValue, 1, 800))
         
-        startGame = tk.Button(self.root, text="Start Game", command=self.startGame)
-        startGame.grid(row=len(difficulties)+1, column=0, sticky=tk.W)
+        # HighScores
+        highscore_header = tk.Label(self.root, text="Highscores", anchor=tk.W)
+        highscore_header.grid(row=0, column=1, sticky=tk.W)
+        highscores = loadHighscores()
+        for i, difficulty in enumerate(difficulties):
+            highscore_difficulty = highscores[difficulty]
+            highscore_string = "\n".join([datetime.fromtimestamp(score).strftime("%M:%S") for score in highscore_difficulty])
+            difficulty_header = tk.Label(self.root, text=highscore_string)
+            difficulty_header.grid(row=i+1, column=1)
         
-        #todo: HighScore button
-
+        startGame = tk.Button(self.root, text="Start Game", command=self.startGame)
+        startGame.grid(row=len(difficulties)+2, column=0,columnspan=2, sticky="ENWS")
+        
         if firstCall:
             self.root.mainloop()
+    
             
     def genValidate(self,var, val, min, max):
         def validate(_var, _index, _mode):
@@ -92,7 +131,7 @@ class Menu:
         x, y, mines = dict[self.difficulty.get()]
         
         if mines < x*y:
-            Game(x, y, mines, self.root)
+            Game(x, y, mines, self.root,self.difficulty.get())
 
 class Game:
     def genLMBClicked(self, x:int, y: int):
@@ -136,6 +175,8 @@ class Game:
             button.config(image=self.hidden)
 
     def reloadFieldGUI(self):
+        if self.field.win:
+            self.saveHighscore()
         for x in range(self.field.x):
             for y in range(self.field.y):
                 self.reloadButton(x, y)
@@ -147,6 +188,15 @@ class Game:
             time = datetime.fromtimestamp(self.counter).strftime("%M:%S")
             self.timer.config(text=time)
         self.timer.after(1000, self.count)
+        
+    def saveHighscore(self):
+        highscores = loadHighscores()
+        highscores[self.difficulty] = [score for score in highscores[self.difficulty] if score != 0]
+        highscores[self.difficulty].append(self.counter)
+        highscores[self.difficulty].sort()
+        highscores[self.difficulty] = highscores[self.difficulty][:5]
+        highscores[self.difficulty] = highscores[self.difficulty] + [0]*(5-len(highscores[self.difficulty]))
+        saveHighscores(highscores)
 
     # restartbutton
     def restart(self):
@@ -165,7 +215,8 @@ class Game:
         self.running = False
         Menu(self.root)
         
-    def __init__(self, x: int, y: int, mines: int, root: tk.Tk):
+    def __init__(self, x: int, y: int, mines: int, root: tk.Tk, difficulty: str):
+        self.difficulty = difficulty
         self.root = root
         clearChildren(self.root)
         self.buttons: list[list[tk.Button]] = []

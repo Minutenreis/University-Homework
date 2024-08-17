@@ -23,7 +23,6 @@ class Field:
             self.mode = "custom"
         
         self.generateField(x, y, mines)
-        self.resetClock()
         self.x = x
         self.y = y
         self.mines = mines
@@ -31,6 +30,7 @@ class Field:
         self.firstGuess = True
         self.revealed = 0
         self.disabled = False
+        self.win = False
         
     def generateField(self, x, y, mines):
         self.field = [[self.Cell(False) for _ in range(y)] for _ in range(x)]
@@ -46,12 +46,6 @@ class Field:
                         if not self.field[xCoord + i][yCoord + j].isMine:
                             self.field[xCoord + i][yCoord + j].neighbours += 1
 
-    def resetClock(self):
-        pass
-    
-    def stopClock(self):
-        pass
-    
     def __revealAllMines(self):
         for i in range(self.x):
             for j in range(self.y):
@@ -59,15 +53,14 @@ class Field:
                     self.field[i][j].isRevealed = True
                             
     def loseGame(self):
-        self.stopClock()
         self.__revealAllMines()
         self.disabled = True
         # todo: show dialog with "game is lost" "try again" "show Highscores" "exit"
     
     def winGame(self):
-        self.stopClock()
         self.__revealAllMines()
         self.disabled = True
+        self.win = True
         # todo: show dialog with "game is lost" "try again" "show Highscores" "exit"
         # todo: save highscore
     

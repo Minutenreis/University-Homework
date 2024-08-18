@@ -215,6 +215,45 @@ class Game:
         self.running = False
         Menu(self.root)
         
+    def notInBounds(self, x, y, i, j):
+        return i == 0 and j == 0 or x+i < 0 or x+i >= self.field.x or y+j < 0 or y+j >= self.field.y
+        
+    def askAI(self):
+        for x in range(self.field.x):
+            for y in range(self.field.y):
+                if self.field.field[x][y].isRevealed and self.field.field[x][y].neighbours > 0:
+                    hiddenFields = 0
+                    flaggedFields = 0
+                    # check all adjacent fields
+                    for i in range(-1,2):
+                        for j in range(-1,2):
+                            if self.notInBounds(x, y, i, j):
+                                continue
+                            if not self.field.field[x+i][y+j].isRevealed and not self.field.field[x+i][y+j].isFlagged:
+                                hiddenFields += 1
+                            if self.field.field[x+i][y+j].isFlagged:
+                                flaggedFields += 1
+                    # if all hidden fields are mines, flag them
+                    if hiddenFields == self.field.field[x][y].neighbours - flaggedFields and hiddenFields > 0:
+                        for i in range(-1,2):
+                            for j in range(-1,2):
+                                if self.notInBounds(x, y, i, j):
+                                    continue
+                                if not self.field.field[x+i][y+j].isRevealed and not self.field.field[x+i][y+j].isFlagged:
+                                    self.field.flag(x+i, y+j)
+                                    self.reloadButton(x+i, y+j)
+                        return
+                    # if all mines are flagged, reveal all other fields
+                    if flaggedFields == self.field.field[x][y].neighbours and hiddenFields > 0:
+                        for i in range(-1,2):
+                            for j in range(-1,2):
+                                if self.notInBounds(x, y, i, j):
+                                    continue
+                                if not self.field.field[x+i][y+j].isRevealed and not self.field.field[x+i][y+j].isFlagged:
+                                    self.field.reveal(x+i, y+j)
+                                    self.reloadFieldGUI()
+                        return
+        
     def __init__(self, x: int, y: int, mines: int, root: tk.Tk, difficulty: str):
         self.difficulty = difficulty
         self.root = root
@@ -245,6 +284,9 @@ class Game:
 
         menuButton = tk.Button(root, text="Menu", command=self.menu)
         menuButton.grid(row=self.field.y+2, column=0, columnspan=self.field.x, sticky="WENS")
+        
+        AskAIButton = tk.Button(root, text="Ask AI", command=self.askAI)
+        AskAIButton.grid(row=self.field.y+3, column=0, columnspan=self.field.x, sticky="WENS")
 
         # mines left
         self.minesLeft = tk.Label(self.root, text=str(self.field.minesLeft)+" ")

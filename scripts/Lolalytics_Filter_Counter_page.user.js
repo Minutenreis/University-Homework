@@ -25,16 +25,12 @@ var pageURLCheckTimer = setInterval(
 
 function main() {
     filter()
-    btn = document.querySelector("[q\\:id='3q']");
+    let btn = document.querySelector("[q\\:id='3q']");
     btn.onclick = filterAfterTimeoutOnce;
 }
 
-let first = true;
 function filterAfterTimeoutOnce() {
-    if (first) {
-        first = false;
-        setTimeout(filter, timeout);
-    }
+    setTimeout(filter, timeout);
 }
 
 function filter() {

@@ -17,7 +17,7 @@ var pageURLCheckTimer = setInterval(
             this.lastPathStr = location.pathname;
             this.lastQueryStr = location.search;
             this.lastHashStr = location.hash;
-            setTimeout(main, 250);
+            setTimeout(main, timeout);
         }
     }
     , 111
@@ -26,10 +26,10 @@ var pageURLCheckTimer = setInterval(
 function main() {
     filter()
     let btn = document.querySelector("[q\\:id='3q']");
-    btn.onclick = filterAfterTimeoutOnce;
+    btn.onclick = filterAfterTimeout;
 }
 
-function filterAfterTimeoutOnce() {
+function filterAfterTimeout() {
     setTimeout(filter, timeout);
 }
 
@@ -38,7 +38,6 @@ function filter() {
     let champSpans = counters.children[0].children[1].children;
     console.log(champSpans.length);
     for (const champSpan of champSpans) {
-        console.log(champSpan.tagName);
         if (champSpan.tagName !== "SPAN") {
             continue;
         }

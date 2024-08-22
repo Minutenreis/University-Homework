@@ -32,9 +32,12 @@ class Field:
         self.disabled = False
         self.win = False
         
-    def generateField(self, x, y, mines):
+    def generateField(self, x: int, y: int, mines: int, x_forbid: int | None = None, y_forbid: int | None = None):
         self.field = [[self.Cell(False) for _ in range(y)] for _ in range(x)]
-        mines = random.sample(range(x * y), mines)
+        allSpots = range(x * y) if (x_forbid is None and y_forbid is None) else range(x * y - 1)
+        mines = random.sample(allSpots, mines)
+        if x_forbid is not None and y_forbid is not None:
+            mines = [mine + 1 if mine >= x_forbid * y_forbid else mine for mine in mines]
         for mine in mines:
             xCoord = mine % x
             yCoord = mine // x
@@ -85,9 +88,8 @@ class Field:
         if self.field[x][y].isFlagged or self.field[x][y].isQuestioned:
             return
         if self.firstGuess:
-            while self.field[x][y].isMine:
-                # todo: might be slow, need to validate inputs too
-                self.generateField(len(self.field), len(self.field[0]), self.mines)
+            if self.field[x][y].isMine:
+                self.generateField(len(self.field), len(self.field[0]), self.mines, x, y)
             self.firstGuess = False
         if self.field[x][y].isRevealed:
             return

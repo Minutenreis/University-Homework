@@ -136,10 +136,13 @@ class Menu:
 class Game:
     def genLMBClicked(self, x:int, y: int):
         def LMBClicked(event):
+            if self.field.firstGuess:
+                self.running = True # start timer
             self.field.reveal(x, y)
             self.reloadFieldGUI()
             if self.field.field[x][y].isMine:
                 self.buttons[x][y].config(image=self.explodedBomb)
+            self.checkAIMovePossible()
         return LMBClicked
 
     def genRMBClicked(self,x:int, y: int):
@@ -147,7 +150,7 @@ class Game:
             self.field.flag(x, y)
             self.reloadButton(x, y)
             self.minesLeft.config(text=str(self.field.minesLeft)+" ")
-
+            self.checkAIMovePossible()
         return RMBClicked
 
     def disableButton(self, button: tk.Button):
@@ -173,7 +176,7 @@ class Game:
             button.config(image=self.question)
         else:
             button.config(image=self.hidden)
-
+    
     def reloadFieldGUI(self):
         if self.field.win:
             self.saveHighscore()
@@ -200,7 +203,7 @@ class Game:
 
     # restartbutton
     def restart(self):
-        self.running = True
+        self.running = False
         self.field.__init__(self.field.x, self.field.y, self.field.mines)
         self.reloadFieldGUI()
         self.counter = 0
@@ -217,8 +220,23 @@ class Game:
         
     def notInBounds(self, x, y, i, j):
         return i == 0 and j == 0 or x+i < 0 or x+i >= self.field.x or y+j < 0 or y+j >= self.field.y
+    
+    def checkAIMovePossible(self, state: bool | None = None):
+        btn = self.askAIButton
+        if self.field.disabled:
+            movePossible = False
+        elif state is not None:
+            movePossible = state
+        else:
+            movePossible = self.askAI(True)
+        if movePossible:
+            btn["state"] = tk.NORMAL
+            btn['text'] = "Ask AI"
+        else:
+            btn["state"] = tk.DISABLED
+            btn['text'] = "No AI move available"
         
-    def askAI(self):
+    def askAI(self, preview = False):
         for x in range(self.field.x):
             for y in range(self.field.y):
                 if self.field.field[x][y].isRevealed and self.field.field[x][y].neighbours > 0:
@@ -235,6 +253,8 @@ class Game:
                                 flaggedFields += 1
                     # if all hidden fields are mines, flag them
                     if hiddenFields == self.field.field[x][y].neighbours - flaggedFields and hiddenFields > 0:
+                        if preview:
+                            return True
                         for i in range(-1,2):
                             for j in range(-1,2):
                                 if self.notInBounds(x, y, i, j):
@@ -242,9 +262,12 @@ class Game:
                                 if not self.field.field[x+i][y+j].isRevealed and not self.field.field[x+i][y+j].isFlagged:
                                     self.field.flag(x+i, y+j)
                                     self.reloadButton(x+i, y+j)
-                        return
+                        self.checkAIMovePossible()
+                        return True
                     # if all mines are flagged, reveal all other fields
                     if flaggedFields == self.field.field[x][y].neighbours and hiddenFields > 0:
+                        if preview:
+                            return True
                         for i in range(-1,2):
                             for j in range(-1,2):
                                 if self.notInBounds(x, y, i, j):
@@ -252,7 +275,10 @@ class Game:
                                 if not self.field.field[x+i][y+j].isRevealed and not self.field.field[x+i][y+j].isFlagged:
                                     self.field.reveal(x+i, y+j)
                                     self.reloadFieldGUI()
-                        return
+                        self.checkAIMovePossible()
+                        return True
+        self.checkAIMovePossible(False)
+        return False
         
     def __init__(self, x: int, y: int, mines: int, root: tk.Tk, difficulty: str):
         self.difficulty = difficulty
@@ -260,7 +286,7 @@ class Game:
         clearChildren(self.root)
         self.buttons: list[list[tk.Button]] = []
         self.counter = 0
-        self.running = True
+        self.running = False
 
         # images
         self.numbers = [tk.PhotoImage(file=f"images/{i}.png") for i in range(9)]
@@ -285,8 +311,9 @@ class Game:
         menuButton = tk.Button(root, text="Menu", command=self.menu)
         menuButton.grid(row=self.field.y+2, column=0, columnspan=self.field.x, sticky="WENS")
         
-        AskAIButton = tk.Button(root, text="Ask AI", command=self.askAI)
-        AskAIButton.grid(row=self.field.y+3, column=0, columnspan=self.field.x, sticky="WENS")
+        self.askAIButton = tk.Button(root, text="Ask AI", command=self.askAI)
+        self.askAIButton.grid(row=self.field.y+3, column=0, columnspan=self.field.x, sticky="WENS")
+        self.checkAIMovePossible(False)
 
         # mines left
         self.minesLeft = tk.Label(self.root, text=str(self.field.minesLeft)+" ")

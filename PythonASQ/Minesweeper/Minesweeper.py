@@ -7,12 +7,14 @@ def main():
     root = tk.Tk()
     root.title("Minesweeper")
     Menu(root, True)
-    
+
+# clear all children of a widget (used to clear the root mainly)  
 def clearChildren(parent):
     for widget in parent.winfo_children():
         widget.destroy()
         
 # Highscores.txt is formatted as 20 lines, first 5 are easy, next 5 are medium, next 5 are hard, last 5 are custom
+# 0 means no highscore
 def loadHighscores() -> dict:
     if os.path.exists("highscores.txt"):
         with open("highscores.txt", "r") as file:
@@ -38,7 +40,7 @@ def saveHighscores(highscores: dict):
 
 
 class Menu:
-
+    # initialize GUI and load highscores
     def __init__(self, root: tk.Tk, firstCall = False):
         self.root = root
         clearChildren(self.root)
@@ -58,6 +60,10 @@ class Menu:
         self.frame = tk.Frame(self.root)
         self.frame.grid(row=len(difficulties)+1, column=0, sticky=tk.W)
         self.difficulty.trace_add("write",self.showCustom)
+        
+        # custom difficulty variables:
+        # x, y, mines are the user inputs
+        # xValue, yValue, minesValue are the last valid values inputted
         self.x = tk.StringVar()
         self.x.set(16)
         self.xValue = tk.IntVar()
@@ -70,16 +76,19 @@ class Menu:
         self.mines.set(40)
         self.minesValue = tk.IntVar()
         self.minesValue.set(40)
+        
+        # validate user input
         self.x.trace_add("write", self.genValidate(self.x, self.xValue, 1, 30))
         self.y.trace_add("write", self.genValidate(self.y, self.yValue, 1, 30))
         self.mines.trace_add("write", self.genValidate(self.mines, self.minesValue, 1, 800))
         
-        # HighScores
+        # load HighScores
         highscore_header = tk.Label(self.root, text="Highscores", anchor=tk.W)
         highscore_header.grid(row=0, column=1, sticky=tk.W)
         highscores = loadHighscores()
         for i, difficulty in enumerate(difficulties):
             highscore_difficulty = highscores[difficulty]
+            # format highscores as MM:SS, "--:--" if no highscore
             highscore_string = "\n".join([datetime.fromtimestamp(score).strftime("%M:%S") if score != 0 else "--:--" for score in highscore_difficulty])
             difficulty_header = tk.Label(self.root, text=highscore_string)
             difficulty_header.grid(row=i+1, column=1)
@@ -87,11 +96,13 @@ class Menu:
         startGame = tk.Button(self.root, text="Start Game", command=self.startGame)
         startGame.grid(row=len(difficulties)+2, column=0,columnspan=2, sticky="ENWS")
         
+        # start GUI (must only be called once)
         if firstCall:
             self.root.mainloop()
     
             
     def genValidate(self,var, val, min, max):
+        # set value if in bounds
         def validate(_var, _index, _mode):
             try:
                 newVal = int(var.get())
@@ -101,7 +112,8 @@ class Menu:
                 return
         return validate
         
-    
+    # if custom is selected, reveal fields to choose number of fields and mines
+    # if it is unselected, clear the fields
     def showCustom(self, _var, _index, _mode):
         if self.difficulty.get() == "Custom":
             x = tk.Entry(self.frame, textvariable=self.x, width=5)
@@ -119,8 +131,7 @@ class Menu:
         else:
             clearChildren(self.frame)
             
-        
-        
+    # start the game with the selected difficulty
     def startGame(self):
         dict = {
             "Easy 8x8": (8, 8, 10),
@@ -130,11 +141,14 @@ class Menu:
         }
         x, y, mines = dict[self.difficulty.get()]
         
+        # check that the game is technically winable (otherwise the generation algorithm might get stuck)
         if mines < x*y:
             Game(x, y, mines, self.root,self.difficulty.get())
 
 class Game:
     def genLMBClicked(self, x:int, y: int):
+        
+        # reveal all fields recursively
         def LMBClicked(event):
             if self.field.firstGuess:
                 self.running = True # start timer
@@ -146,6 +160,8 @@ class Game:
         return LMBClicked
 
     def genRMBClicked(self,x:int, y: int):
+        
+        # flag or question a field
         def RMBClicked(event):
             self.field.flag(x, y)
             self.reloadButton(x, y)
@@ -158,6 +174,7 @@ class Game:
         button.unbind("<Button-3>")
         button["relief"]=tk.SUNKEN
 
+    # reload a single button
     def reloadButton(self,x,y):
         cell = self.field.field[x][y]
         button: tk.Button = self.buttons[x][y]
@@ -177,6 +194,7 @@ class Game:
         else:
             button.config(image=self.hidden)
     
+    # reload all buttons
     def reloadFieldGUI(self):
         if self.field.win:
             self.saveHighscore()
@@ -221,6 +239,7 @@ class Game:
     def notInBounds(self, x, y, i, j):
         return i == 0 and j == 0 or x+i < 0 or x+i >= self.field.x or y+j < 0 or y+j >= self.field.y
     
+    # check if next AI move is possible and enable / disable the button depending on it
     def checkAIMovePossible(self, state: bool | None = None):
         btn = self.askAIButton
         if self.field.disabled:
@@ -235,13 +254,18 @@ class Game:
         else:
             btn["state"] = tk.DISABLED
             btn['text'] = "No AI move available"
-        
+    
+    # ask a (primitive) AI for the next move
+    # will just look whether there are trivial solutions
+    # a field with x unmarked neighbours and x mines remaining: all neighbours are mines and will be flagged
+    # a field with x marked neighbours and x mines remaining: all other neighbours are safe and will be revealed
     def askAI(self, preview = False):
         for x in range(self.field.x):
             for y in range(self.field.y):
                 if self.field.field[x][y].isRevealed and self.field.field[x][y].neighbours > 0:
                     hiddenFields = 0
                     flaggedFields = 0
+                    
                     # check all adjacent fields
                     for i in range(-1,2):
                         for j in range(-1,2):
@@ -251,6 +275,7 @@ class Game:
                                 hiddenFields += 1
                             if self.field.field[x+i][y+j].isFlagged:
                                 flaggedFields += 1
+                                
                     # if all hidden fields are mines, flag them
                     if hiddenFields == self.field.field[x][y].neighbours - flaggedFields and hiddenFields > 0:
                         if preview:
@@ -260,10 +285,14 @@ class Game:
                                 if self.notInBounds(x, y, i, j):
                                     continue
                                 if not self.field.field[x+i][y+j].isRevealed and not self.field.field[x+i][y+j].isFlagged:
+                                    # have to call method twice on questioned fields
+                                    if self.field.field[x+i][y+j].isQuestioned:
+                                        self.field.flag(x+i, y+j)
                                     self.field.flag(x+i, y+j)
                                     self.reloadButton(x+i, y+j)
                         self.checkAIMovePossible()
                         return True
+                    
                     # if all mines are flagged, reveal all other fields
                     if flaggedFields == self.field.field[x][y].neighbours and hiddenFields > 0:
                         if preview:
@@ -280,6 +309,7 @@ class Game:
         self.checkAIMovePossible(False)
         return False
         
+    # initialize GUI and field
     def __init__(self, x: int, y: int, mines: int, root: tk.Tk, difficulty: str):
         self.difficulty = difficulty
         self.root = root

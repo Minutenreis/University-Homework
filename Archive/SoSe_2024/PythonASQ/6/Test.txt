@@ -1,0 +1,6 @@
+str "str%0A	%0D"
+int 1
+float 1.0
+bool True
+bool False
+NoneType None

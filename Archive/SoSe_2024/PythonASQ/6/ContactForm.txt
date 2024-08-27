@@ -1,0 +1,7 @@
+Name: test
+Age: test2
+Place of Birth: test3
+Favorite Food: test4
+Favorite Color: test5
+Hobby: test6
+Name of Pet: test7

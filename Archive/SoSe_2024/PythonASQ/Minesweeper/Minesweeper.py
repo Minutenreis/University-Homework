@@ -176,11 +176,14 @@ class Game:
 
     # reload a single button
     def reloadButton(self,x,y):
-        cell = self.field.field[x][y]
+        cell: Field.Cell = self.field.field[x][y]
         button: tk.Button = self.buttons[x][y]
         if self.field.disabled:
             self.disableButton(button)
             self.running = False
+            if cell.isFlagged and not cell.isMine:
+                button.config(image=self.fakeBomb, bg="white")
+                return
         if cell.isRevealed:
             if cell.isMine:
                 button.config(image=self.bomb, bg="white")

@@ -32,7 +32,7 @@ class Field:
         mines = random.sample(allSpots, mines)
         # shift mine positions if forbidden spot is set
         if x_forbid is not None and y_forbid is not None:
-            mines = [mine + 1 if mine >= x_forbid * y_forbid else mine for mine in mines]
+            mines = [mine + 1 if mine >= x_forbid + x * y_forbid else mine for mine in mines]
         # apply mines to field, increment all neighbours of mines "neighbours" attribute
         for mine in mines:
             xCoord = mine % x
@@ -65,7 +65,7 @@ class Field:
     # flag cell ("right click"), unflagged -> flagged -> questioned -> unflagged
     # adjust minesLeft accordingly
     def flag(self, x, y):
-        if self.field[x][y].isRevealed:
+        if self.field[x][y].isRevealed or self.disabled or self.firstGuess:
             return
         if not self.field[x][y].isFlagged and not self.field[x][y].isQuestioned:
             # can't flag more mines than there are
@@ -95,12 +95,19 @@ class Field:
         # first guess
         if self.firstGuess:
             if self.field[x][y].isMine:
-                self.generateField(len(self.field), len(self.field[0]), self.mines, x, y)
+                self.generateField(self.x, self.y, self.mines, x, y)
             self.firstGuess = False
         
         # reveal field
         self.field[x][y].isRevealed = True
         self.revealed += 1
+        
+        # if forced reveal fields are possibly in "locked" states
+        if self.field[x][y].isFlagged:
+            self.field[x][y].isFlagged = False
+            self.minesLeft += 1
+        if self.field[x][y].isQuestioned:
+            self.field[x][y].isQuestioned = False
         
         # lose game if mine is hit
         if self.field[x][y].isMine:

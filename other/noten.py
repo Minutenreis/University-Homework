@@ -41,6 +41,7 @@ noten = [
     (1.0,4), # Algorithmisches Beweisen LAB 
     (2.7,6), # Algorithmisches Beweisen
     (1.3,3), # Projektmanagement (ASQ) 
+    (1.0,4), # Skriptsprachen in der Bioinformatik (ASQ) 
     (2.3,4), # Mathematische Methoden der Physik I
     ]
 

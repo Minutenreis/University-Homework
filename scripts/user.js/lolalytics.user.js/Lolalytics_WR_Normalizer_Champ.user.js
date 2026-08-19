@@ -93,8 +93,16 @@ function getAverageWR() {
 // always sits immediately before the "WR Delta" box, which IS unique.
 function getWinRateValueDiv() {
     const deltaLabel = findDivByOwnText(text => text.trim() === "WR Delta");
-    const winRateBox = deltaLabel?.parentElement.previousElementSibling;
-    return winRateBox ? winRateBox.firstElementChild : null;
+    if (deltaLabel) {
+        const winRateBox = deltaLabel.parentElement.previousElementSibling;
+        return winRateBox ? winRateBox.firstElementChild : null;
+    }
+    // The "vs" subpage (e.g. .../vayne/vs/caitlyn/build/) has no WR Delta
+    // box at all -- there the same stat box pairs "Win Rate" with "Games"
+    // instead. Its label is still the first exact "Win Rate" text on the
+    // page, so fall back to matching it directly.
+    const winRateLabel = findDivByOwnText(text => text.trim() === "Win Rate");
+    return winRateLabel ? winRateLabel.parentElement.firstElementChild : null;
 }
 
 function normalizeChampWR() {

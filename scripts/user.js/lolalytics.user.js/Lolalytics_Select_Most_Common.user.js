@@ -25,7 +25,31 @@ var pageURLCheckTimer = setInterval(
   }
   , 111
 );
-selectMostCommon();
+// The page's Qwik-rendered content streams in rather than being present at
+// document-idle, so firing selectMostCommon() unconditionally here can race a
+// still-loading page: the tab button may not exist yet, or may exist without
+// its click handler wired up, and clicking it mid-stream has been observed to
+// leave parts of the page stuck half-loaded. waitForElement holds off until
+// the button is actually present (then applies the same debounceMs settle
+// delay used elsewhere) instead of firing blind.
+function waitForElement(condition, callback) {
+  if (condition()) {
+    setTimeout(callback, debounceMs);
+    return;
+  }
+  const readyObserver = new MutationObserver(() => {
+    if (condition()) {
+      readyObserver.disconnect();
+      setTimeout(callback, debounceMs);
+    }
+  });
+  readyObserver.observe(document.body, { childList: true, subtree: true });
+}
+
+waitForElement(
+  () => findDivByOwnText(text => text.trim() === "Most Common Build") !== null,
+  selectMostCommon
+);
 
 // Finds the <div> whose own first text node satisfies `predicate`, ignoring
 // nested elements (tooltip "?" icons, hidden tooltip bodies) that would
